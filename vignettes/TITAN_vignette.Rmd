@@ -1,0 +1,41 @@
+---
+title: "TITAN Tutorial"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{TITAN Tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(TITAN)
+```
+
+In its current state, TITAN is built to work off of the R package `Seurat`. The first step in any TITAN workflow is to create a Seurat object containing the data you would like to run an LDA model on. This tutorial assumes that general QC has been run and poorly performing cells have been filtered out. Once you've done this, you can begin using TITAN. To begin building the model, the user has two options. 
+
+The first is running a single LDA model on the data.
+
+```{r}
+LDA_model <- runLDA(SeuratObj, ntopics = 50)
+
+```
+
+This will return an LDA model with 50 topics, created using the default alpha and beta values, as well as the default values for a number of other parameters. Depending on the size of your data, this function can take multiple hours to run, so it is important to make sure you have the necessary computational resources. 
+
+
+The second option is to use the `parallel_runLDA` function. This is for users that may not know how many topics they want in their model. This function does the same thing as the `runLDA` function, but a number of times in parallel, each time using a different number of topics. 
+
+```{r}
+parallel_runLDA(SeuratObj, "output_directory", top_start = 5, top_end = 50, step = 5)
+
+```
+
+The above command will run 10 instances of the `runLDA` function starting with only using 5 topics, going up to using 50 topics, stepping up by 5 each time. The 10 instances are run at the same time in parallel. The models will be output as `.rds` files into the given output directory. 
+

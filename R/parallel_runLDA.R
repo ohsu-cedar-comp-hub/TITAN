@@ -4,19 +4,21 @@
 #' This function runs a series of LDA models on scRNA-seq expression data in parallel.
 #'
 #' @param Object Seurat object containing the data the model was created with.
-#' @param ntopics Number of topics to be used in the model
+#' @param top_start Lowest number of topics to run a model with
+#' @param top_end Highest number of topics to run a model with
+#' @param step The step to use between top_start and top_end. (e.g a step of 5 with top_start = 5 and top_end = 50 will run 10 instances of the model using up to 50 topics counting up by 5)
+#' @param cores Number of cores available. The recommended value is top_end/step
 #' @param outdir Directory for all of the output models
 #' @param alpha the value for alpha in the LDA model
 #' @param beta the value for beta in the LDA model
 #' @param varFeatures the number of variable features to use in the LDA model. The more features that are used, the slower the model will run and the more noise that will be introduced, but the model will be more complete in representing your entire dataset.
 #' @param iterations the number of iterations used when learning the LDA model.
 #' @param burnin number of iterations to run to allow the model to learn before calculating certain statistics. Models start at random points, so this allows model to get closer to the fit before certain statistics are calculated.
-#' @param top_start Lowest number of topics to run a model with
-#' @param top_end Highest number of topics to run a model with
+#' 
 #'
 #'
 #' @examples
-#' parallel_runLDA(SeuratObj, ntopics = 20, "model_dir/")
+#' parallel_runLDA(SeuratObj, "model_dir")
 #'
 #' @return saves the different models to the given output directory
 #'
@@ -28,7 +30,7 @@
 #' @import parallel
 
 
-parallel_runLDA <- function(Object, ntopics, outdir, alpha = 50, beta = 0.1, varFeatures = 5000, iterations = 500, burnin = 250, top_start = 5, top_end = 50) {
+parallel_runLDA <- function(Object, outdir, top_start = 5, top_end = 50, step = 5, cores = 10, alpha = 50, beta = 0.1, varFeatures = 5000, iterations = 500, burnin = 250) {
 
   #Normalize and extract the gene expression data from the Seurat Object
   Object        <- NormalizeData(Object, assay = "RNA", normalization.method = "CLR")
@@ -51,7 +53,7 @@ parallel_runLDA <- function(Object, ntopics, outdir, alpha = 50, beta = 0.1, var
   cellList      <- lapply(cellList, function(x) {colnames(x) <- Genes[x[1,]+1];x})
 
   #create vector of topic numbers
-  topic_options <- seq(top_start, top_end, 5)
+  topic_options <- seq(top_start, top_end, step)
 
   #Run models using the different numbers of topics in parallel
   model_maker <- function(topics) {
@@ -64,10 +66,10 @@ parallel_runLDA <- function(Object, ntopics, outdir, alpha = 50, beta = 0.1, var
       eta=beta,
       compute.log.likelihood=TRUE,
       burnin=burnin)[-1]
-    saveRDS(selected.Model, paste0(outdir, "Model_", as.character(topics), "topics.rds"))
+    saveRDS(selected.Model, paste0(outdir, "/Model_", as.character(topics), "topics.rds"))
   }
 
-  mclapply(topic_options, model_maker, mc.cores = length(topic_options))
+  mclapply(topic_options, model_maker, mc.cores = cores)
 }
 
 

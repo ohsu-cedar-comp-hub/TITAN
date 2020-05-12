@@ -4,16 +4,22 @@
 \alias{parallel_runLDA}
 \title{Runs a series of LDA models in parallel}
 \usage{
-parallel_runLDA(Object, ntopics, outdir, alpha = 50, beta = 0.1,
-  varFeatures = 5000, iterations = 500, burnin = 250,
-  top_start = 5, top_end = 50)
+parallel_runLDA(Object, outdir, top_start = 5, top_end = 50,
+  step = 5, cores = 10, alpha = 50, beta = 0.1,
+  varFeatures = 5000, iterations = 500, burnin = 250)
 }
 \arguments{
 \item{Object}{Seurat object containing the data the model was created with.}
 
-\item{ntopics}{Number of topics to be used in the model}
-
 \item{outdir}{Directory for all of the output models}
+
+\item{top_start}{Lowest number of topics to run a model with}
+
+\item{top_end}{Highest number of topics to run a model with}
+
+\item{step}{The step to use between top_start and top_end. (e.g a step of 5 with top_start = 5 and top_end = 50 will run 10 instances of the model using up to 50 topics counting up by 5)}
+
+\item{cores}{Number of cores available. The recommended value is top_end/step}
 
 \item{alpha}{the value for alpha in the LDA model}
 
@@ -24,10 +30,6 @@ parallel_runLDA(Object, ntopics, outdir, alpha = 50, beta = 0.1,
 \item{iterations}{the number of iterations used when learning the LDA model.}
 
 \item{burnin}{number of iterations to run to allow the model to learn before calculating certain statistics. Models start at random points, so this allows model to get closer to the fit before certain statistics are calculated.}
-
-\item{top_start}{Lowest number of topics to run a model with}
-
-\item{top_end}{Highest number of topics to run a model with}
 }
 \value{
 saves the different models to the given output directory
@@ -36,6 +38,6 @@ saves the different models to the given output directory
 This function runs a series of LDA models on scRNA-seq expression data in parallel.
 }
 \examples{
-parallel_runLDA(SeuratObj, ntopics = 20, "model_dir/")
+parallel_runLDA(SeuratObj, "model_dir")
 
 }
