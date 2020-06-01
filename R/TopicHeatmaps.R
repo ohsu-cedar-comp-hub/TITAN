@@ -176,3 +176,47 @@ heatmapSortByTopicAsWellAsAnno  <- function(Object, topics, sortByTopic =  "Topi
 }
 
  
+
+#' Clustered Topic Heatmap
+#'
+#'
+#' This function produces a heatmap where the columns are clustered based on the expression pattern of the topics
+#'
+#' @param Object Seurat object containing the data the model was created with.
+#' @param topics document-topic matrix
+#' @param AnnoVector Vector of cell annotations
+#' @param AnnoName Name of cell annotation
+#'
+#' @examples
+#' heatmap(SeuratObj, DocTopMat, SeuratObj$annotation, "NameOfAnnotation")
+#'
+#' @return pheatmap object
+#'
+#'
+#' @export
+#'
+#' @import pheatmap
+#' @import RColorBrewer
+
+heatmapClusterTopics <- function(Object, topics, AnnoVector, AnnoName) {
+  anno_col <- data.frame(row.names = colnames(Object),
+                         Column1=AnnoVector)
+  colnames(anno_col) <- AnnoName
+  num_colors = length(unique(anno_col[,1]))
+  anno_colors = gg_color_hue(num_colors)
+  names(anno_colors) <- sort(unique(anno_col[,1]))
+  anno_colors <- list(Cluster = anno_colors)
+  topics <- data.matrix(topics[order(anno_col[,1]),])  
+  summary(topics)
+  p1 <- pheatmap(topics,
+                 hclustfun = function(x) hclust(x, method="ward.D2"),
+                 scale = "row",
+                 cluster_cols = T,
+                 cluster_rows = F,show_rownames = F,
+                 col=colorRampPalette(rev(brewer.pal(11, "RdBu"))[c(1:4,8:11)])(256),
+                 annotation_row = anno_col,
+                 annotation_names_row = T,
+                 annotation_colors = anno_colors,
+                 cex=1)
+  return(p1)
+}

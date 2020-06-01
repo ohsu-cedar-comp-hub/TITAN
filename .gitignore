@@ -38,3 +38,6 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 inst/doc
+
+# Large data files
+data/PEPE_T47D.rds

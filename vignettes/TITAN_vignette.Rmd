@@ -15,14 +15,16 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(TITAN)
+#library(TITAN)
 ```
 
 In its current state, TITAN is built to work off of the R package `Seurat`. The first step in any TITAN workflow is to create a Seurat object containing the data you would like to run an LDA model on. This tutorial assumes that general QC has been run and poorly performing cells have been filtered out. Once you've done this, you can begin using TITAN. To begin building the model, the user has two options. 
 
+### Building a Model
+
 The first is running a single LDA model on the data.
 
-```{r}
+```{r eval = F}
 LDA_model <- runLDA(SeuratObj, ntopics = 50)
 
 ```
@@ -32,10 +34,39 @@ This will return an LDA model with 50 topics, created using the default alpha an
 
 The second option is to use the `parallel_runLDA` function. This is for users that may not know how many topics they want in their model. This function does the same thing as the `runLDA` function, but a number of times in parallel, each time using a different number of topics. 
 
-```{r}
+```{r eval = F}
 parallel_runLDA(SeuratObj, "output_directory", top_start = 5, top_end = 50, step = 5)
 
 ```
 
 The above command will run 10 instances of the `runLDA` function starting with only using 5 topics, going up to using 50 topics, stepping up by 5 each time. The 10 instances are run at the same time in parallel. The models will be output as `.rds` files into the given output directory. 
 
+### Evaluating Models
+
+Now the task is to determine which of these models is the ideal one to use in downstream analysis. To do this we have developed our own version of an Elbow plot.
+
+```{r eval = F}
+LDAelbowPlot("output_directory", SeuratObj)
+getwd()
+```
+
+![Elbow Plot](../data/Elbowplot_T47D_PEPE.png)
+
+### Analyzing Models
+
+Now that we have built a model and determine that it does a good job of capturing our data, we can analyze the model. For the rest of the vignette, we will be using a model with 20 topics that was built on a dataset containing T47D single cells, some treated with estrogen, some treated with progesterone, and some treated with both estrogen and progesterone.
+
+First, read in the Seurat object RDS and the model RDS.
+
+```{r}
+SO <- readRDS("data/PEPE_T47D.rds")
+top_model <- readRDS("data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
+
+```
+
+The first step in the analysis pipeline is to add the topic information to the original Seurat object. This allows us to employ many of Seurat's built in plot functions to visualize the model.
+
+```{r}
+addTopicsToSeuratObject(top_model, SO)
+
+```
