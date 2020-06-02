@@ -59,14 +59,85 @@ Now that we have built a model and determine that it does a good job of capturin
 First, read in the Seurat object RDS and the model RDS.
 
 ```{r}
-SO <- readRDS("data/PEPE_T47D.rds")
-top_model <- readRDS("data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
+SO <- readRDS("../data/PEPE_T47D.rds")
+top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
 
 ```
 
 The first step in the analysis pipeline is to add the topic information to the original Seurat object. This allows us to employ many of Seurat's built in plot functions to visualize the model.
 
 ```{r}
-addTopicsToSeuratObject(top_model, SO)
+SO <- addTopicsToSeuratObject(top_model, SO)
 
 ```
+
+Now that the topic information has been stored within the Seurat object, we can begin analyzing the contents of the topics.
+
+```{r}
+LDA_topics <- top.topic.words(top_model$topics, num.words = 50, by.score = T)
+colnames(LDA_topics) <- paste("Topic", 1:ncol(LDA_topics), sep = "_")
+```
+
+The above chunk of code extracts the top 50 genes associated with each topic. These genes can be used to connect each topic to a certain gene network or ontology. 
+
+Next, the goal is to see which cells express which topics. We do this through heatmaps.
+
+```{r}
+heatmap(Object = SO,
+          topics =  SO@meta.data %>% select(starts_with("Topic")),
+          AnnoVector = SO@meta.data$hash.ID,
+          AnnoName = "Time Point")
+
+
+```
+
+You can also cluster the topics of the heatmap so that topics with similar expression patterns across cells are grouped together.
+
+```{r}
+heatmapClusterTopics(Object = SO,
+          topics =  SO@meta.data %>% select(starts_with("Topic")),
+          AnnoVector = SO@meta.data$hash.ID,
+          AnnoName = "Time Point")
+
+```
+
+In both of the above cases, the rows of the heatmap were sorted by time point. They can be sorted by any metadata column in the Seurat object as well, such as cluster.
+
+```{r}
+heatmap(Object = SO,
+          topics =   SO@meta.data %>% select(starts_with("Topic")), 
+          AnnoVector = SO$seurat_clusters, 
+          AnnoName = "Cluster")
+
+
+```
+
+
+Another way to visualize the expression of the topics is through Seurat's FeaturePlot function.
+
+```{r}
+FeaturePlot(SO, pt.size = 0.01, features  = paste("Topic", 13:20, sep = "_"), ncol = 4, min.cutoff = 'q5')
+
+```
+
+This plots the cells using the UMAP embeddings within the Seurat object, and then colors the cells based on their expression of the given topic.
+
+
+```{r}
+testSO <- readRDS("../data/PEPE_T47D.rds")
+top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
+
+```
+
+
+```{r}
+SCE <- as.SingleCellExperiment(testSO)
+
+```
+
+```{r}
+SCE <- addTopicsToSCE(top_model, SCE)
+
+```
+
+
