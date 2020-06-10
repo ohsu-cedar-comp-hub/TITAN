@@ -21,3 +21,30 @@ GetTopics <- function(model, Object) {
   colnames(modelMat) <- paste("Topic", 1:ncol(modelMat), sep="_")
   return(modelMat)
 }
+
+
+#' Extract Top Topic Genes
+#'
+#'
+#' This function extracts the top scoring genes for each gene
+#'
+#' @param model LDA model.
+#' @param ngenes Number of genes to extract for each topic.
+#' 
+#'
+#' @examples
+#' TopTopicGenes(LDA_model, 50)
+#'
+#' @return matrix containing top genes for each topic
+#'
+#'
+#' @export
+#' 
+#' @import lda
+
+
+TopTopicGenes <- function(model, ngenes) {
+  Topic_Genes        <- top.topic.words(model$topics, num.words = ngenes, by.score = T)
+  colnames(Topic_Genes) <- paste("Topic", 1:ncol(Topic_Genes), sep = "_")
+  return(Topic_Genes)
+}
