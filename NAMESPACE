@@ -2,6 +2,7 @@
 
 export(GetTopics)
 export(LDAelbowPlot)
+export(SCE_FeaturePlot)
 export(TopTopicGenes)
 export(TransferTopics)
 export(addTopicsToSCE)
