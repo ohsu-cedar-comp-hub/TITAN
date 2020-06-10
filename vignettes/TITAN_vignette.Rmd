@@ -47,7 +47,7 @@ Now the task is to determine which of these models is the ideal one to use in do
 
 ```{r eval = F}
 LDAelbowPlot("output_directory", SeuratObj)
-getwd()
+
 ```
 
 ![Elbow Plot](../data/Elbowplot_T47D_PEPE.png)
@@ -122,22 +122,69 @@ FeaturePlot(SO, pt.size = 0.01, features  = paste("Topic", 13:20, sep = "_"), nc
 
 This plots the cells using the UMAP embeddings within the Seurat object, and then colors the cells based on their expression of the given topic.
 
+### Using a SingleCellExperiment Object
+
+Building the model is ran the same way,
 
 ```{r}
 testSO <- readRDS("../data/PEPE_T47D.rds")
-top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
-
-```
-
-
-```{r}
 SCE <- as.SingleCellExperiment(testSO)
 
 ```
 
-```{r}
-SCE <- addTopicsToSCE(top_model, SCE)
+Running a single model,
+
+```{r eval = F}
+LDA_model <- runLDA(SCE, ntopics = 50)
 
 ```
+
+Running multiple models,
+
+```{r eval = F}
+parallel_runLDA(SCE, "output_directory", top_start = 5, top_end = 50, step = 5)
+
+```
+
+Checking the number of topics through an Elbow plot
+
+```{r eval = F}
+LDAelbowPlot("output_directory", SCE)
+
+```
+
+![Elbow Plot](../data/Elbowplot_T47D_PEPE_SCE.png)
+
+Loading in the pre-built model using the same number of topics as before,
+
+```{r}
+SCE_model <- readRDS("../data/Model_SCE_PEPE_T47D_20T.rds")
+```
+
+This model will be slightly different than the one ran using the Seurat object. This is due to the SingleCellExperiment workflow using a slightly different feature space. However, the results remain mostly the same.
+
+```{r}
+SCE <- addTopicsToSCE(SCE_model, SCE)
+
+```
+
+
+```{r}
+SCE_topics <- GetTopics(SCE_model, SCE)
+heatmap(T47D_SCE, SCE_topics, T47D_SCE@colData@listData$hash.ID, "Timepoint")
+
+```
+
+```{r}
+SCE_FeaturePlot(T47D_SCE, pt.size = 0.01, topics = 1:8, ncol = 4, min.cutoff = 'q5')
+SCE_FeaturePlot(T47D_SCE, pt.size = 0.01, topics = 9:16, ncol = 4, min.cutoff = 'q5')
+SCE_FeaturePlot(T47D_SCE, pt.size = 0.01, topics = 17:20, ncol = 4, min.cutoff = 'q5')
+
+```
+
+
+
+
+
 
 

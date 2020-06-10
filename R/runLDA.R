@@ -3,7 +3,7 @@
 #'
 #' This function runs an LDA model on scRNA-seq expression data
 #'
-#' @param Object Seurat object containing the data the model was created with.
+#' @param Object Object containing the data the model was created with.
 #' @param ntopics Number of topics to be used in the model
 #' @param alpha the value for alpha in the LDA model
 #' @param beta the value for beta in the LDA model
@@ -22,18 +22,31 @@
 #'
 #' @import Seurat
 #' @import lda
+#' @import SingleCellExperiment
 
 
 runLDA <- function(Object, ntopics, alpha = 50, beta = 0.1, varFeatures = 5000, iterations = 500, burnin = 250) {
   
+  if (class(Object) == "Seurat") {
   #Normalize and extract the gene expression data from the Seurat Object
-  Object        <- NormalizeData(Object, assay = "RNA", normalization.method = "CLR")
-  Object        <- FindVariableFeatures(Object, assay = "RNA", nfeatures = varFeatures)
-  Object.sparse <- GetAssayData(Object, slot = "data",assay = "RNA")
-  Object.sparse <- Object[VariableFeatures(Object, assay = "RNA"),]
+    Object        <- NormalizeData(Object, assay = "RNA", normalization.method = "CLR")
+    Object        <- FindVariableFeatures(Object, assay = "RNA", nfeatures = varFeatures)
+    Object.sparse <- GetAssayData(Object, slot = "data",assay = "RNA")
+    Object.sparse <- Object[VariableFeatures(Object, assay = "RNA"),]
   
   #convert data into the proper input format for lda.collapsed.gibbs.sampler
-  data.use      <- Matrix::Matrix(Object.sparse, sparse = T)
+    data.use      <- Matrix::Matrix(Object.sparse, sparse = T)
+  }
+  
+  if (class(Object) == "SingleCellExperiment") {
+    normalized_sce <- NormalizeData(assay(Object, "counts"), normalization.method = "CLR")
+    varFeats <- FindVariableFeatures(normalized_sce)
+    varFeats$gene <- rownames(varFeats)
+    varFeats <- top_n(varFeats, 5000, vst.variance.standardized)
+    
+    data.use <- Matrix::Matrix(normalized_sce[varFeats$gene,], sparse = T)
+  }
+  
   data.use      <- data.use * 10 ## OG 10
   data.use      <- round(data.use)
   data.use      <- Matrix::Matrix(data.use, sparse = T)
@@ -60,4 +73,6 @@ runLDA <- function(Object, ntopics, alpha = 50, beta = 0.1, varFeatures = 5000, 
   
   return(Model)
 }
+
+
 

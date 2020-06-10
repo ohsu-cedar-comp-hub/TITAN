@@ -3,7 +3,7 @@
 #'
 #' This function runs a series of LDA models on scRNA-seq expression data in parallel.
 #'
-#' @param Object Seurat object containing the data the model was created with.
+#' @param Object Object containing the data the model was created with.
 #' @param top_start Lowest number of topics to run a model with
 #' @param top_end Highest number of topics to run a model with
 #' @param step The step to use between top_start and top_end. (e.g a step of 5 with top_start = 5 and top_end = 50 will run 10 instances of the model using up to 50 topics counting up by 5)
@@ -28,18 +28,31 @@
 #' @import Seurat
 #' @import lda
 #' @import parallel
+#' @import SingleCellExperiment
 
 
 parallel_runLDA <- function(Object, outdir, top_start = 5, top_end = 50, step = 5, cores = 10, alpha = 50, beta = 0.1, varFeatures = 5000, iterations = 500, burnin = 250) {
 
-  #Normalize and extract the gene expression data from the Seurat Object
-  Object        <- NormalizeData(Object, assay = "RNA", normalization.method = "CLR")
-  Object        <- FindVariableFeatures(Object, assay = "RNA", nfeatures = varFeatures)
-  Object.sparse <- GetAssayData(Object[VariableFeatures(Object, assay = "RNA"),], slot = "data",assay = "RNA")
-  #Object.sparse <- Object.sparse[VariableFeatures(Object, assay = "RNA"),]
-
-  #convert data into the proper input format for lda.collapsed.gibbs.sampler
-  data.use      <- Matrix::Matrix(Object.sparse, sparse = T)
+  if (class(Object) == "Seurat") {
+    #Normalize and extract the gene expression data from the Seurat Object
+    Object        <- NormalizeData(Object, assay = "RNA", normalization.method = "CLR")
+    Object        <- FindVariableFeatures(Object, assay = "RNA", nfeatures = varFeatures)
+    Object.sparse <- GetAssayData(Object, slot = "data",assay = "RNA")
+    Object.sparse <- Object[VariableFeatures(Object, assay = "RNA"),]
+    
+    #convert data into the proper input format for lda.collapsed.gibbs.sampler
+    data.use      <- Matrix::Matrix(Object.sparse, sparse = T)
+  }
+  
+  if (class(Object) == "SingleCellExperiment") {
+    normalized_sce <- NormalizeData(assay(Object, "counts"), normalization.method = "CLR")
+    varFeats <- FindVariableFeatures(normalized_sce)
+    varFeats$gene <- rownames(varFeats)
+    varFeats <- top_n(varFeats, 5000, vst.variance.standardized)
+    
+    data.use <- Matrix::Matrix(normalized_sce[varFeats$gene,], sparse = T)
+  }
+  
   data.use      <- round(data.use * 10)
   #data.use      <- Matrix::Matrix(data.use, sparse = T)
   sumMat        <- Matrix::summary(data.use)
