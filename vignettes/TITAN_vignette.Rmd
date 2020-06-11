@@ -16,8 +16,6 @@ knitr::opts_chunk$set(
 
 ```{r message = F, warning=F}
 library(TITAN)
-library(lda)
-library(dplyr)
 library(Seurat)
 ```
 
@@ -77,8 +75,7 @@ SO <- addTopicsToSeuratObject(top_model, SO)
 Now that the topic information has been stored within the Seurat object, we can begin analyzing the contents of the topics.
 
 ```{r}
-LDA_topics <- top.topic.words(top_model$topics, num.words = 50, by.score = T)
-colnames(LDA_topics) <- paste("Topic", 1:ncol(LDA_topics), sep = "_")
+LDA_topics <- GetTopics(top_model, SO)
 ```
 
 The above chunk of code extracts the top 50 genes associated with each topic. These genes can be used to connect each topic to a certain gene network or ontology. 
@@ -87,7 +84,7 @@ Next, the goal is to see which cells express which topics. We do this through he
 
 ```{r, fig.width=8, fig.height=8}
 heatmap(Object = SO,
-          topics =  SO@meta.data %>% select(starts_with("Topic")),
+          topics =  LDA_topics,
           AnnoVector = SO@meta.data$hash.ID,
           AnnoName = "Time Point")
 
@@ -98,7 +95,7 @@ You can also cluster the topics of the heatmap so that topics with similar expre
 
 ```{r, fig.width=8, fig.height=8}
 heatmapClusterTopics(Object = SO,
-          topics =  SO@meta.data %>% select(starts_with("Topic")),
+          topics =  LDA_topics,
           AnnoVector = SO@meta.data$hash.ID,
           AnnoName = "Time Point")
 
@@ -108,7 +105,7 @@ In both of the above cases, the rows of the heatmap were sorted by time point. T
 
 ```{r, fig.width=8, fig.height=8}
 heatmap(Object = SO,
-          topics =   SO@meta.data %>% select(starts_with("Topic")), 
+          topics =   LDA_topics, 
           AnnoVector = SO$seurat_clusters, 
           AnnoName = "Cluster")
 
@@ -130,9 +127,7 @@ This plots the cells using the UMAP embeddings within the Seurat object, and the
 Building the model is ran the same way,
 
 ```{r}
-testSO <- readRDS("../data/PEPE_T47D.rds")
-SCE <- as.SingleCellExperiment(testSO)
-
+SCE <- readRDS("../data/PEPE_T47D_SCE.rds")
 ```
 
 Running a single model,

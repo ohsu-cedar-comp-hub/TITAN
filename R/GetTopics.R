@@ -44,7 +44,7 @@ GetTopics <- function(model, Object) {
 
 
 TopTopicGenes <- function(model, ngenes) {
-  Topic_Genes        <- top.topic.words(model$topics, num.words = ngenes, by.score = T)
+  Topic_Genes        <- lda::top.topic.words(model$topics, num.words = ngenes, by.score = T)
   colnames(Topic_Genes) <- paste("Topic", 1:ncol(Topic_Genes), sep = "_")
   return(Topic_Genes)
 }
