@@ -8,7 +8,7 @@ runLDA(Object, ntopics, alpha = 50, beta = 0.1, varFeatures = 5000,
   iterations = 500, burnin = 250)
 }
 \arguments{
-\item{Object}{Seurat object containing the data the model was created with.}
+\item{Object}{Object containing the data the model was created with.}
 
 \item{ntopics}{Number of topics to be used in the model}
 

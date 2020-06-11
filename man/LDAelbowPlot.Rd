@@ -9,7 +9,7 @@ LDAelbowPlot(model_dir, SO)
 \arguments{
 \item{model_dir}{Directory containing the models created using a varying number of topics.}
 
-\item{SO}{Seurat object containing the data the model was created with.}
+\item{SO}{Object containing the data the model was created with.}
 }
 \value{
 ggplot object

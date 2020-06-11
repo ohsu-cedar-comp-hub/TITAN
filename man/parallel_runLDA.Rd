@@ -9,7 +9,7 @@ parallel_runLDA(Object, outdir, top_start = 5, top_end = 50,
   varFeatures = 5000, iterations = 500, burnin = 250)
 }
 \arguments{
-\item{Object}{Seurat object containing the data the model was created with.}
+\item{Object}{Object containing the data the model was created with.}
 
 \item{outdir}{Directory for all of the output models}
 

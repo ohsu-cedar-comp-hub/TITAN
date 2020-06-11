@@ -21,7 +21,7 @@
  
 
 SCE_FeaturePlot <- function(object, pt.size, topics, ncol, min.cutoff) {
-  temp_SO <- as.Seurat(object, counts = names(T47D_SCE@assays)[1])
+  temp_SO <- as.Seurat(object, counts = names(object@assays)[1])
   FeaturePlot(temp_SO, pt.size = pt.size, features = paste("Topic", topics, sep = "_"), ncol = ncol, min.cutoff = min.cutoff)
 }
 

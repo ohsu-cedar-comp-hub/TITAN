@@ -14,8 +14,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-#library(TITAN)
+```{r message = F, warning=F}
+library(TITAN)
+library(lda)
+library(dplyr)
+library(Seurat)
 ```
 
 In its current state, TITAN is built to work off of the R package `Seurat`. The first step in any TITAN workflow is to create a Seurat object containing the data you would like to run an LDA model on. This tutorial assumes that general QC has been run and poorly performing cells have been filtered out. Once you've done this, you can begin using TITAN. To begin building the model, the user has two options. 
@@ -50,7 +53,7 @@ LDAelbowPlot("output_directory", SeuratObj)
 
 ```
 
-![Elbow Plot](../data/Elbowplot_T47D_PEPE.png)
+![Elbow Plot](../data/Elbowplot_T47D_PEPE.png){ width=40% }
 
 ### Analyzing Models
 
@@ -82,7 +85,7 @@ The above chunk of code extracts the top 50 genes associated with each topic. Th
 
 Next, the goal is to see which cells express which topics. We do this through heatmaps.
 
-```{r}
+```{r, fig.width=8, fig.height=8}
 heatmap(Object = SO,
           topics =  SO@meta.data %>% select(starts_with("Topic")),
           AnnoVector = SO@meta.data$hash.ID,
@@ -93,7 +96,7 @@ heatmap(Object = SO,
 
 You can also cluster the topics of the heatmap so that topics with similar expression patterns across cells are grouped together.
 
-```{r}
+```{r, fig.width=8, fig.height=8}
 heatmapClusterTopics(Object = SO,
           topics =  SO@meta.data %>% select(starts_with("Topic")),
           AnnoVector = SO@meta.data$hash.ID,
@@ -103,7 +106,7 @@ heatmapClusterTopics(Object = SO,
 
 In both of the above cases, the rows of the heatmap were sorted by time point. They can be sorted by any metadata column in the Seurat object as well, such as cluster.
 
-```{r}
+```{r, fig.width=8, fig.height=8}
 heatmap(Object = SO,
           topics =   SO@meta.data %>% select(starts_with("Topic")), 
           AnnoVector = SO$seurat_clusters, 
@@ -115,7 +118,7 @@ heatmap(Object = SO,
 
 Another way to visualize the expression of the topics is through Seurat's FeaturePlot function.
 
-```{r}
+```{r, fig.width=8, fig.height=6}
 FeaturePlot(SO, pt.size = 0.01, features  = paste("Topic", 13:20, sep = "_"), ncol = 4, min.cutoff = 'q5')
 
 ```
@@ -153,7 +156,7 @@ LDAelbowPlot("output_directory", SCE)
 
 ```
 
-![Elbow Plot](../data/Elbowplot_T47D_PEPE_SCE.png)
+![Elbow Plot](../data/Elbowplot_T47D_PEPE_SCE.png){ width=40% }
 
 Loading in the pre-built model using the same number of topics as before,
 
@@ -169,16 +172,19 @@ SCE <- addTopicsToSCE(SCE_model, SCE)
 ```
 
 
-```{r}
+```{r, fig.width=8, fig.height=8}
 SCE_topics <- GetTopics(SCE_model, SCE)
-heatmap(T47D_SCE, SCE_topics, T47D_SCE@colData@listData$hash.ID, "Timepoint")
+heatmap(SCE, SCE_topics, SCE@colData@listData$hash.ID, "Timepoint")
 
 ```
 
-```{r}
-SCE_FeaturePlot(T47D_SCE, pt.size = 0.01, topics = 1:8, ncol = 4, min.cutoff = 'q5')
-SCE_FeaturePlot(T47D_SCE, pt.size = 0.01, topics = 9:16, ncol = 4, min.cutoff = 'q5')
-SCE_FeaturePlot(T47D_SCE, pt.size = 0.01, topics = 17:20, ncol = 4, min.cutoff = 'q5')
+```{r, warning=F, fig.width=8, fig.height=6}
+SCE_FeaturePlot(SCE, pt.size = 0.01, topics = 1:8, ncol = 4, min.cutoff = 'q5')
+SCE_FeaturePlot(SCE, pt.size = 0.01, topics = 9:16, ncol = 4, min.cutoff = 'q5')
+```
+
+```{r echo = F, warning=F, fig.width=8, fig.height=3}
+SCE_FeaturePlot(SCE, pt.size = 0.01, topics = 17:20, ncol = 4, min.cutoff = 'q5')
 
 ```
 
