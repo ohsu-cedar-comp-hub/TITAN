@@ -16,13 +16,26 @@
 #'
 #' @import Seurat
 
-addTopicsToSeuratObject <- function(model, Object) {
+addTopicsToSeuratObject <- function(model,
+                                    Object) {
+
+  ## Get Cell Topic Scores and scale across Topics
   modelMat           <- t(scale(model$document_expects, center=TRUE, scale=TRUE))
   rownames(modelMat) <- paste(1:ncol(Object), colnames(Object), sep="_")
   colnames(modelMat) <- paste("Topic", 1:ncol(modelMat), sep="_")
+
+  ## Add to metaData
   Object@meta.data   <- cbind(Object@meta.data, modelMat)
+
+  ## Add lda topics to a dim reduc
+  Object[["lda"]] <- CreateDimReducObject(
+    embeddings = modelMat,
+    key = "lda_",
+    assay = "RNA",
+    global = TRUE
+  )
   return(Object)
-} 
+}
 
 
 
@@ -45,10 +58,15 @@ addTopicsToSeuratObject <- function(model, Object) {
 #' @import SingleCellExperiment
 
 addTopicsToSCE <- function(model, Object) {
+
+  ## Get Cell Topic Scores and scale across Topics
   modelMat           <- t(scale(model$document_expects, center=TRUE, scale=TRUE))
   modelMat           <- split(modelMat, rep(1:ncol(modelMat), each = nrow(modelMat)))
   #rownames(modelMat) <- paste(1:ncol(Object), colnames(Object), sep="_")
   names(modelMat) <- paste("Topic", 1:length(modelMat), sep="_")
+
+  ## Add Topics to metaData of scExpiriment Object
   Object@colData@listData   <- c(Object@colData@listData, modelMat)
+
   return(Object)
-} 
+}

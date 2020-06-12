@@ -4,8 +4,16 @@
 \alias{runLDA}
 \title{Runs LDA Model}
 \usage{
-runLDA(Object, ntopics, alpha = 50, beta = 0.1, varFeatures = 5000,
-  iterations = 500, burnin = 250)
+runLDA(
+  Object,
+  ntopics,
+  alpha = 50,
+  beta = 0.1,
+  varFeatures = 5000,
+  iterations = 500,
+  burnin = 250,
+  seed.number = 8
+)
 }
 \arguments{
 \item{Object}{Object containing the data the model was created with.}
@@ -21,6 +29,8 @@ runLDA(Object, ntopics, alpha = 50, beta = 0.1, varFeatures = 5000,
 \item{iterations}{the number of iterations used when learning the LDA model.}
 
 \item{burnin}{number of iterations to run to allow the model to learn before calculating certain statistics. Models start at random points, so this allows model to get closer to the fit before certain statistics are calculated.}
+
+\item{seed.number}{random integer to set seed}
 }
 \value{
 LDA Model

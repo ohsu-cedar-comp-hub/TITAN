@@ -13,7 +13,7 @@ gg_color_hue(n)
 Vector of colors for plotting
 }
 \description{
-This function creates a vector of colors
+This function creates a vector of colors similar to the default colors of ggplot2
 }
 \examples{
 gg_color_hue(50)

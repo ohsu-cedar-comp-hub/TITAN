@@ -15,7 +15,7 @@ TopTopicGenes(model, ngenes)
 matrix containing top genes for each topic
 }
 \description{
-This function extracts the top scoring genes for each gene
+This function extracts the top n scoring genes for each gene
 }
 \examples{
 TopTopicGenes(LDA_model, 50)

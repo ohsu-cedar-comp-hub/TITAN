@@ -22,7 +22,7 @@
 
 LDAelbowPlot <- function(model_dir, SO) {
   files <- list.files(path = model_dir, pattern = "Model_")
-  
+
   # Get model input data
   if (class(Object) == "Seurat") {
     #Normalize and extract the gene expression data from the Seurat Object
@@ -30,20 +30,20 @@ LDAelbowPlot <- function(model_dir, SO) {
     Object        <- FindVariableFeatures(Object, assay = "RNA", nfeatures = varFeatures)
     Object.sparse <- GetAssayData(Object, slot = "data",assay = "RNA")
     Object.sparse <- Object[VariableFeatures(Object, assay = "RNA"),]
-    
+
     #convert data into the proper input format for lda.collapsed.gibbs.sampler
     data.use      <- Matrix::Matrix(Object.sparse, sparse = T)
-  }
-  
-  if (class(Object) == "SingleCellExperiment") {
+  } else if (class(Object) == "SingleCellExperiment") {
     normalized_sce <- NormalizeData(assay(Object, "counts"), normalization.method = "CLR")
     varFeats <- FindVariableFeatures(normalized_sce)
     varFeats$gene <- rownames(varFeats)
     varFeats <- top_n(varFeats, 5000, vst.variance.standardized)
-    
+
     data.use <- Matrix::Matrix(normalized_sce[varFeats$gene,], sparse = T)
-  }
-  
+  } else (
+    message("Object must be of class singleCellExpriment or Seurat")
+  )
+
   data.use <- data.use * 10
   data.use <- round(data.use)
 

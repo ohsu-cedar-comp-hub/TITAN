@@ -1,7 +1,7 @@
 #' Creates vector of annotation colors
 #'
 #'
-#' This function creates a vector of colors 
+#' This function creates a vector of colors similar to the default colors of ggplot2
 #'
 #' @param n Desired length of vector
 #'
@@ -43,8 +43,11 @@ gg_color_hue <- function(n) {
 #' @import pheatmap
 #' @import RColorBrewer
 
-heatmap <- function(Object, topics, AnnoVector, AnnoName) {
-  
+heatmap <- function(Object,
+                    topics,
+                    AnnoVector,
+                    AnnoName) {
+
   #Create a dataframe with the annotation information and corresponding colors
   anno_col           <- data.frame(row.names = colnames(Object),
                          Column1=AnnoVector)
@@ -53,10 +56,11 @@ heatmap <- function(Object, topics, AnnoVector, AnnoName) {
   anno_colors        <- gg_color_hue(num_colors)
   names(anno_colors) <- sort(unique(anno_col[,1]))
   anno_colors        <- list(Cluster = anno_colors)
-  
+  names(anno_colors) <- AnnoName
+
   #Add annotation color information to topics
-  topics <- data.matrix(topics[order(anno_col[,1]),])  
-  
+  topics <- data.matrix(topics[order(anno_col[,1]),])
+
   #plot heatmap
   p1 <- pheatmap(topics,
                  hclustfun = function(x) hclust(x, method="ward.D2"),
@@ -95,8 +99,11 @@ heatmap <- function(Object, topics, AnnoVector, AnnoName) {
 #' @import RColorBrewer
 
 
-heatmapSortByTopic  <- function(Object, topics, sortByTopic =  "Topic_16", AnnoVector, AnnoName) {
-  
+heatmapSortByTopic  <- function(Object,
+                                topics,
+                                sortByTopic =  "Topic_1",
+                                AnnoVector, AnnoName) {
+
   #Create a dataframe with the annotation information and corresponding colors
   anno_col           <- data.frame(row.names = colnames(Object),
                          Column1=AnnoVector)
@@ -105,10 +112,11 @@ heatmapSortByTopic  <- function(Object, topics, sortByTopic =  "Topic_16", AnnoV
   anno_colors        <- gg_color_hue(num_colors)
   names(anno_colors) <- sort(unique(anno_col[,1]))
   anno_colors        <- list(Cluster = anno_colors)
-  
+  names(anno_colors) <- AnnoName
+
   #Add annotation color information to topics
-  topics <- data.matrix(topics[order(topics[,sortByTopic]),]) 
-  
+  topics <- data.matrix(topics[order(topics[,sortByTopic]),])
+
   #plot heatmap
   p1 <- pheatmap(topics,
                  hclustfun = function(x) hclust(x, method="ward.D2"),
@@ -147,8 +155,11 @@ heatmapSortByTopic  <- function(Object, topics, sortByTopic =  "Topic_16", AnnoV
 #' @import RColorBrewer
 
 
-heatmapSortByTopicAsWellAsAnno  <- function(Object, topics, sortByTopic =  "Topic_16", AnnoVector, AnnoName) {
-  
+heatmapSortByTopicAsWellAsAnno  <- function(Object,
+                                            topics,
+                                            sortByTopic =  "Topic_1",
+                                            AnnoVector, AnnoName) {
+
   #Create a dataframe with the annotation information and corresponding colors
   anno_col           <- data.frame(row.names = colnames(Object),
                          Column1=AnnoVector)
@@ -157,10 +168,11 @@ heatmapSortByTopicAsWellAsAnno  <- function(Object, topics, sortByTopic =  "Topi
   anno_colors        <- gg_color_hue(num_colors)
   names(anno_colors) <- sort(unique(anno_col[,1]))
   anno_colors        <- list(Cluster = anno_colors)
-  
+  names(anno_colors) <- AnnoName
+
   #Add annotation color information to topics
-  topics <- data.matrix(topics[order( anno_col[,1], topics[,sortByTopic]),])  
-  
+  topics <- data.matrix(topics[order( anno_col[,1], topics[,sortByTopic]),])
+
   #plot heatmap
   p1 <- pheatmap(topics,
                  hclustfun = function(x) hclust(x, method="ward.D2"),
@@ -175,7 +187,7 @@ heatmapSortByTopicAsWellAsAnno  <- function(Object, topics, sortByTopic =  "Topi
   return(p1)
 }
 
- 
+
 
 #' Clustered Topic Heatmap
 #'
@@ -198,7 +210,10 @@ heatmapSortByTopicAsWellAsAnno  <- function(Object, topics, sortByTopic =  "Topi
 #' @import pheatmap
 #' @import RColorBrewer
 
-heatmapClusterTopics <- function(Object, topics, AnnoVector, AnnoName) {
+heatmapClusterTopics <- function(Object,
+                                 topics,
+                                 AnnoVector,
+                                 AnnoName) {
   anno_col <- data.frame(row.names = colnames(Object),
                          Column1=AnnoVector)
   colnames(anno_col) <- AnnoName
@@ -206,8 +221,10 @@ heatmapClusterTopics <- function(Object, topics, AnnoVector, AnnoName) {
   anno_colors = gg_color_hue(num_colors)
   names(anno_colors) <- sort(unique(anno_col[,1]))
   anno_colors <- list(Cluster = anno_colors)
-  topics <- data.matrix(topics[order(anno_col[,1]),])  
-  summary(topics)
+  names(anno_colors) <- AnnoName
+
+  topics <- data.matrix(topics[order(anno_col[,1]),])
+
   p1 <- pheatmap(topics,
                  hclustfun = function(x) hclust(x, method="ward.D2"),
                  scale = "row",

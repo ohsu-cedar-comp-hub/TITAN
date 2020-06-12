@@ -4,8 +4,13 @@
 \alias{heatmapSortByTopic}
 \title{Topic Heatmap - sorted by topic}
 \usage{
-heatmapSortByTopic(Object, topics, sortByTopic = "Topic_16", AnnoVector,
-  AnnoName)
+heatmapSortByTopic(
+  Object,
+  topics,
+  sortByTopic = "Topic_1",
+  AnnoVector,
+  AnnoName
+)
 }
 \arguments{
 \item{Object}{Seurat object containing the data the model was created with.}

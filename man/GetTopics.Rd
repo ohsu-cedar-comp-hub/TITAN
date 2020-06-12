@@ -15,7 +15,7 @@ GetTopics(model, Object)
 document-topic matrix
 }
 \description{
-This function extracts the topic information from the LDA model. The output matrix is the document-topic matrix showing how much each cell corresponds with each topic
+This function extracts the cell-topic information from the LDA model. The output matrix is the cell-topic matrix giving a normalized score of how much each cell corresponds with each topic
 }
 \examples{
 GetTopics(LDA_model, SeuratObj)

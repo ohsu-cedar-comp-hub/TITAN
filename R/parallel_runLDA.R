@@ -14,7 +14,8 @@
 #' @param varFeatures the number of variable features to use in the LDA model. The more features that are used, the slower the model will run and the more noise that will be introduced, but the model will be more complete in representing your entire dataset.
 #' @param iterations the number of iterations used when learning the LDA model.
 #' @param burnin number of iterations to run to allow the model to learn before calculating certain statistics. Models start at random points, so this allows model to get closer to the fit before certain statistics are calculated.
-#' 
+#' @param seed.number random integer to set seed
+#'
 #'
 #'
 #' @examples
@@ -31,7 +32,21 @@
 #' @import SingleCellExperiment
 
 
-parallel_runLDA <- function(Object, outdir, top_start = 5, top_end = 50, step = 5, cores = 10, alpha = 50, beta = 0.1, varFeatures = 5000, iterations = 500, burnin = 250) {
+parallel_runLDA <- function(Object,
+                            outdir,
+                            top_start = 5,
+                            top_end = 50,
+                            step = 5,
+                            cores = 10,
+                            alpha = 50,
+                            beta = 0.1,
+                            varFeatures = 5000,
+                            iterations = 500,
+                            burnin = 250,
+                            seed.number = 8) {
+
+  ## Set seed
+  set.seed(seed.number)
 
   if (class(Object) == "Seurat") {
     #Normalize and extract the gene expression data from the Seurat Object
@@ -39,22 +54,23 @@ parallel_runLDA <- function(Object, outdir, top_start = 5, top_end = 50, step = 
     Object        <- FindVariableFeatures(Object, assay = "RNA", nfeatures = varFeatures)
     Object.sparse <- GetAssayData(Object, slot = "data",assay = "RNA")
     Object.sparse <- Object[VariableFeatures(Object, assay = "RNA"),]
-    
+
     #convert data into the proper input format for lda.collapsed.gibbs.sampler
     data.use      <- Matrix::Matrix(Object.sparse, sparse = T)
-  }
-  
-  if (class(Object) == "SingleCellExperiment") {
+  } else if (class(Object) == "SingleCellExperiment") {
     normalized_sce <- NormalizeData(assay(Object, "counts"), normalization.method = "CLR")
     varFeats <- FindVariableFeatures(normalized_sce)
     varFeats$gene <- rownames(varFeats)
-    varFeats <- top_n(varFeats, 5000, vst.variance.standardized)
-    
+    # top.features <- names(x = varFeats)[1:min(varFeatures, length(x = feature.variance))]
+    varFeats <- top_n(varFeats, varFeatures, vst.variance.standardized)
+
     data.use <- Matrix::Matrix(normalized_sce[varFeats$gene,], sparse = T)
+  } else {
+    message("Input must be of class SingleCellExpriment or SeuratObject")
   }
-  
+
+  ## Convert to integer normalized data for LDA into format library(lda) uses
   data.use      <- round(data.use * 10)
-  #data.use      <- Matrix::Matrix(data.use, sparse = T)
   sumMat        <- Matrix::summary(data.use)
   cellList      <- split(as.integer(data.use@i),
                          sumMat$j)
