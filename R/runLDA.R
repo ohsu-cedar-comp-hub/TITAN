@@ -4,6 +4,7 @@
 #' This function runs an LDA model on scRNA-seq expression data
 #'
 #' @param Object Object containing the data the model was created with.
+#' @param normalizationMethod Normalization method used by Seurat NormalizeData. Options are CLR, LogNormalize and RC.
 #' @param ntopics Number of topics to be used in the model
 #' @param alpha the value for alpha in the LDA model
 #' @param beta the value for beta in the LDA model
@@ -33,14 +34,15 @@ runLDA <- function(Object,
                    varFeatures = 5000,
                    iterations = 500,
                    burnin = 250,
-                   seed.number = 8) {
+                   seed.number = 8,
+                   normalizationMethod = "CLR") {
 
   ## Set seed
   set.seed(seed.number)
 
   if (class(Object) == "Seurat") {
   #Normalize and extract the gene expression data from the Seurat Object
-    Object        <- NormalizeData(Object, assay = "RNA", normalization.method = "CLR")
+    Object        <- NormalizeData(Object, assay = "RNA", normalization.method = normalizationMethod)
     Object        <- FindVariableFeatures(Object, assay = "RNA", nfeatures = varFeatures)
     Object.sparse <- GetAssayData(Object, slot = "data",assay = "RNA")
     Object.sparse <- Object[VariableFeatures(Object, assay = "RNA"),]
@@ -48,7 +50,7 @@ runLDA <- function(Object,
   #convert data into the proper input format for lda.collapsed.gibbs.sampler
     data.use      <- Matrix::Matrix(Object.sparse, sparse = T)
   } else if (class(Object) == "SingleCellExperiment") {
-    normalized_sce <- NormalizeData(assay(Object, "counts"), normalization.method = "CLR")
+    normalized_sce <- NormalizeData(assay(Object, "counts"), normalization.method = normalizationMethod)
     varFeats <- FindVariableFeatures(normalized_sce)
     varFeats$gene <- rownames(varFeats)
     varFeats <- top_n(varFeats, 5000, vst.variance.standardized)

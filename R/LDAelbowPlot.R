@@ -20,7 +20,8 @@
 #' @import lda
 #' @import SingleCellExperiment
 
-LDAelbowPlot <- function(model_dir, SO) {
+LDAelbowPlot <- function(model_dir,
+                         SO) {
   files <- list.files(path = model_dir, pattern = "Model_")
 
   # Get model input data

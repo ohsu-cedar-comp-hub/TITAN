@@ -28,6 +28,7 @@ addTopicsToSeuratObject <- function(model,
   Object@meta.data   <- cbind(Object@meta.data, modelMat)
 
   ## Add lda topics to a dim reduc
+  rownames(modelMat) = colnames(Object)
   Object[["lda"]] <- CreateDimReducObject(
     embeddings = modelMat,
     key = "lda_",

@@ -10,23 +10,32 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  cache=T
 )
 ```
+
+
+## What is Titan?
+
+  TITAN (Topic Inference of Transciptionally Associated Networks) is an R package that runs Topic Modeling on scRNA-seq data. Topic modeling in the traditional sense has been used in text mining to link words and documents to topics. Topics in the traditional sense  can be thought of as themes, such as categories in news article inference (science, politics, etc). TITAN applies topic modeling to scRNA-seq to find latent transcriptional topics that link genes to topics and cells to topics. TITAN utalizes a nlp alghorithm called Latent Dirchlet Allocation (LDA) that maximizes these two probability distributions that show 1) the probability a gene is assigned to a topic and 2) the probability a cell is assigned to a topic. 
+
+
+## Object Setup
 
 ```{r message = F, warning=F}
 library(TITAN)
 library(Seurat)
 ```
 
-In its current state, TITAN is built to work off of the R package `Seurat`. The first step in any TITAN workflow is to create a Seurat object containing the data you would like to run an LDA model on. This tutorial assumes that general QC has been run and poorly performing cells have been filtered out. Once you've done this, you can begin using TITAN. To begin building the model, the user has two options. 
+In its current state, TITAN is built to work off of the R package `Seurat`. The first step in TITAN is to create a Seurat object containing your scRNA-seq data. This tutorial assumes that general QC has been run and poorly performing cells have been filtered out. Directions for that can be found in the vingette found [here](https://satijalab.org/seurat/v3.1/pbmc3k_tutorial.html). We also understand that there are other formats of single cell objects, such as SingleCellExpiriment. Seurat has documentation on conversion to SeuratObject from different types of objects found [here](https://satijalab.org/seurat/v3.1/conversion_vignette.html). Once you've done this, you can begin using TITAN. To begin building the model, the user has two options. 
 
 ### Building a Model
 
-The first is running a single LDA model on the data.
+The first is running a single LDA model on the data. This process has two steps. First is to normalize the data. We do this using Seurats normalize data function with the added recommendation that one uses the centered log-ratio (CLR) transformation due to the varying levels of gene expression seen per cell and topic modeling's preference for genes that have high counts. 
 
 ```{r eval = F}
-LDA_model <- runLDA(SeuratObj, ntopics = 50)
+LDA_model <- runLDA(SeuratObj, ntopics = 50, normalizationMethod = "CLR")
 
 ```
 
