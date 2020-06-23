@@ -42,10 +42,10 @@ LDA_model <- runLDA(SeuratObj, ntopics = 50, normalizationMethod = "CLR")
 This will return an LDA model with 50 topics, created using the default alpha and beta values, as well as the default values for a number of other parameters. Depending on the size of your data, this function can take multiple hours to run, so it is important to make sure you have the necessary computational resources. 
 
 
-The second option is to use the `parallel_runLDA` function. This is for users that may not know how many topics they want in their model. This function does the same thing as the `runLDA` function, but a number of times in parallel, each time using a different number of topics. 
+The second option is to use the parallel option of the `runLDA` function. This is for users that may not know how many topics they want in their model. This function does the same thing as above, but a number of times in parallel, each time using a different number of topics. Now the `ntopics` argument takes a vector of numbers and the function will produce a new model for every number of topics in the list.
 
 ```{r eval = F}
-parallel_runLDA(SeuratObj, "output_directory", top_start = 5, top_end = 50, step = 5)
+runLDA(SeuratObj, ntopics = seq(5, 50, by=5), parallel = TRUE, outDir = "output_directory", cores = 10)
 
 ```
 
