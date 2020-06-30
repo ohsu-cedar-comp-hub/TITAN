@@ -69,33 +69,58 @@ Now that we have built a model and determine that it does a good job of capturin
 First, read in the Seurat object RDS and the model RDS.
 
 ```{r}
-SO <- readRDS("../data/PEPE_T47D.rds")
-top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
+SO <- readRDS("~/Box Sync/Alex_Data/MCF7/PEPE/RDS/PEPE_T47D.rds")
+top_model <- readRDS("~/Box Sync/Alex_Data/MCF7/PEPE/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
 
 ```
 
 The first step in the analysis pipeline is to add the topic information to the original Seurat object. This allows us to employ many of Seurat's built in plot functions to visualize the model.
 
 ```{r}
-SO <- addTopicsToSeuratObject(top_model, SO)
-
+SO <- addTopicsToSeuratObject(model = top_model, Object = SO)
 ```
 
-Now that the topic information has been stored within the Seurat object, we can begin analyzing the contents of the topics.
+Now that the topic information has been stored within the Seurat object, we can begin analyzing the contents of the topics. There are two distrubutions that LDA outputs. The first being the assignments of genes in each topic, using the scores of each gene per topic we can look at which genes contribute most per topic. The first function here, `GeneScores` outputs a matrix with a table of the scores for each gene. Sorting by topic, one can see the disribution of genes and which genes contribute most to each topic. An alternative to this matrix is to get a matrix of the top n genes in each topic. This can be done with `TopTopicScores` and the list of genes can be inputted into your favorite GO program. 
 
 ```{r}
-LDA_topics <- GetTopics(top_model, SO)
+
+GeneDistrubition <- GeneScores(top_model)
+
+### head and sort the matrix by genes most contributing to Topic 1
+head(GeneDistrubition[order(GeneDistrubition[,"Topic_1"], decreasing = T),], n = 10)
+
 ```
 
-The above chunk of code extracts the top 50 genes associated with each topic. These genes can be used to connect each topic to a certain gene network or ontology. 
 
-Next, the goal is to see which cells express which topics. We do this through heatmaps.
+An alternative to this matrix is to get a matrix of the top n genes in each topic. This can be done with `TopTopicScores`, which sorts the gene-topic matrix and outputs a matrix list of n genes for eaech topic which can be inputted into your favorite GO program.These genes can be used to connect each topic to a certain gene network or ontology. 
+
+``` {r,}
+TopicWords <- TopTopicGenes(top_model, ngenes = 50)
+head(TopicWords, 10)
+```
+
+
+
+The second distrubtion that TITAN outputs is the cell-topic distrubition which outputs the contribution each cell belongs to a topic, calculated from the gene scores. The `GetTopics` function outputs a scaled cell-topic matrix. Alternatively, the `addTopicsToSeuratObject` function added this cell-topic matrix to our metadata files so if that has been run it can also be done by wrangling the meta.data in your Seurat object.
+
+``` {r,}
+## Using the get topics function
+LDA_topics <- GetTopics(top_model, SO)
+head(LDA_topics)
+
+## Using the meta data columns (must run addTopicsToSeruatObject() first)
+library(tidyverse)
+LDA_topics <- SO@meta.data %>% select(starts_with("Topic"))
+head(LDA_topics)
+```
+
+Although, the cell-topic matrix contains valuable infomration about each cells contribution to each topic. It is often hard to parse. For this reason, it is nice to visualize which cells contribute to each topic and how each topic compares to eachother.To do this, we recommend visualizing the cell-topic matrix in heatmap form. The goal is to see which cells express which topics. The `heatmap` function allows one to plot the topics across a heatmap and sort the cells by a column of interest. In our case, we are wondering whihch topics are associated with each treatment so we will be annotating the function with our treatment column, but one could use any other metadata column
 
 ```{r, fig.width=8, fig.height=8}
-heatmap(Object = SO,
-          topics =  LDA_topics,
-          AnnoVector = SO@meta.data$hash.ID,
-          AnnoName = "Time Point")
+HeatmapTopic(Object = SO,
+        topics =  LDA_topics,
+        AnnoVector = SO@meta.data$hash.ID,
+        AnnoName = "Time Point")
 
 
 ```
@@ -103,34 +128,57 @@ heatmap(Object = SO,
 You can also cluster the topics of the heatmap so that topics with similar expression patterns across cells are grouped together.
 
 ```{r, fig.width=8, fig.height=8}
-heatmapClusterTopics(Object = SO,
-          topics =  LDA_topics,
-          AnnoVector = SO@meta.data$hash.ID,
-          AnnoName = "Time Point")
+HeatmapTopic(Object = SO,
+             topics =  LDA_topics,
+             AnnoVector = SO@meta.data$hash.ID,
+             AnnoName = "Time Point",
+             clusterTopics = T)
 
 ```
 
 In both of the above cases, the rows of the heatmap were sorted by time point. They can be sorted by any metadata column in the Seurat object as well, such as cluster.
 
 ```{r, fig.width=8, fig.height=8}
-heatmap(Object = SO,
-          topics =   LDA_topics, 
-          AnnoVector = SO$seurat_clusters, 
-          AnnoName = "Cluster")
+HeatmapTopic(Object = SO,
+             topics =   LDA_topics, 
+             AnnoVector = SO$seurat_clusters, 
+             AnnoName = "Cluster")
 
 
 ```
 
 
-Another way to visualize the expression of the topics is through Seurat's FeaturePlot function.
+Another way to visualize the expression of the topics is through Seurat's FeaturePlot function. This plots the cells using the UMAP embeddings within the Seurat object, and then colors the cells based on their expression of the given topic.
 
 ```{r, fig.width=8, fig.height=6}
-FeaturePlot(SO, pt.size = 0.01, features  = paste("Topic", 13:20, sep = "_"), ncol = 4, min.cutoff = 'q5')
+FeaturePlot(SO, 
+            pt.size = 0.01, 
+            features  = "Topic_1", 
+            min.cutoff = 'q1')
+FeaturePlot(SO, 
+            pt.size = 0.01, 
+            features  = paste("Topic", 13:20, sep = "_"), 
+            ncol = 4, 
+            min.cutoff = 'q1')
 
 ```
 
-This plots the cells using the UMAP embeddings within the Seurat object, and then colors the cells based on their expression of the given topic.
 
+Further, we find it also useful to plot two LDA topics against eachother when trying to compare how cells react to different tracriptional topics. An example being in our T47D expriment, we find many topics that are up at the late stage estrogne timepoint. Plotting 3 of the topics (11, 17 and 14)
+
+```{r, fig.width=8, fig.height=6}
+DimPlot(SO, 
+        pt.size = 0.01, 
+        reduction = "lda", 
+        dims = c(17,1),
+        group.by = "hash.ID")      
+DimPlot(SO, 
+        pt.size = 0.01, 
+        reduction = "lda", 
+        dims = c(11,17),
+        group.by = "hash.ID")        
+
+```
 ### Using a SingleCellExperiment Object
 
 Building the model is ran the same way,

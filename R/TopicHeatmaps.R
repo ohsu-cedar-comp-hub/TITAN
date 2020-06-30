@@ -25,7 +25,7 @@ gg_color_hue <- function(n) {
 #' Topic Heatmap
 #'
 #'
-#' This function produces a heatmap showing how much each cell lies within each topic
+#' This function produces a Heatmap showing how much each cell lies within each topic
 #'
 #' @param Object Seurat object containing the data the model was created with.
 #' @param topics document-topic matrix
@@ -33,7 +33,7 @@ gg_color_hue <- function(n) {
 #' @param AnnoName Name of cell annotation
 #'
 #' @examples
-#' heatmap(SeuratObj, DocTopMat, SeuratObj$annotation, "NameOfAnnotation")
+#' Heatmap(SeuratObj, DocTopMat, SeuratObj$annotation, "NameOfAnnotation")
 #'
 #' @return pheatmap object
 #'
@@ -43,10 +43,11 @@ gg_color_hue <- function(n) {
 #' @import pheatmap
 #' @import RColorBrewer
 
-heatmap <- function(Object,
+HeatmapTopic <- function(Object,
                     topics,
                     AnnoVector,
-                    AnnoName) {
+                    AnnoName,
+                    clusterTopics = F) {
 
   #Create a dataframe with the annotation information and corresponding colors
   anno_col           <- data.frame(row.names = colnames(Object),
@@ -61,17 +62,30 @@ heatmap <- function(Object,
   #Add annotation color information to topics
   topics <- data.matrix(topics[order(anno_col[,1]),])
 
-  #plot heatmap
-  p1 <- pheatmap(topics,
-                 hclustfun = function(x) hclust(x, method="ward.D2"),
-                 scale = "row",
-                 cluster_cols = F,
-                 cluster_rows = F,show_rownames = F,
-                 col=colorRampPalette(rev(brewer.pal(11, "RdBu"))[c(1:4,8:11)])(256),
-                 annotation_row = anno_col,
-                 annotation_names_row = T,
-                 annotation_colors = anno_colors,
-                 cex=1)
+  #plot Heatmap
+  if (clusterTopics == F) {
+    p1 <- pheatmap(topics,
+                   hclustfun = function(x) hclust(x, method="ward.D2"),
+                   scale = "row",
+                   cluster_cols = F,
+                   cluster_rows = F,show_rownames = F,
+                   col=colorRampPalette(rev(brewer.pal(11, "RdBu"))[c(1:4,8:11)])(256),
+                   annotation_row = anno_col,
+                   annotation_names_row = T,
+                   annotation_colors = anno_colors,
+                   cex=1)
+  } else {
+    p1 <- pheatmap(topics,
+                   hclustfun = function(x) hclust(x, method="ward.D2"),
+                   scale = "row",
+                   cluster_cols = T,
+                   cluster_rows = F,show_rownames = F,
+                   col=colorRampPalette(rev(brewer.pal(11, "RdBu"))[c(1:4,8:11)])(256),
+                   annotation_row = anno_col,
+                   annotation_names_row = T,
+                   annotation_colors = anno_colors,
+                   cex=1)
+  }
   return(p1)
 }
 
@@ -79,7 +93,7 @@ heatmap <- function(Object,
 #' Topic Heatmap - sorted by topic
 #'
 #'
-#' This function produces a heatmap showing how much each cell lies within each topic. The cells in the heatmap are sorted based on their scores in a given topic.
+#' This function produces a Heatmap showing how much each cell lies within each topic. The cells in the Heatmap are sorted based on their scores in a given topic.
 #'
 #' @param Object Seurat object containing the data the model was created with.
 #' @param topics document-topic matrix
@@ -88,7 +102,7 @@ heatmap <- function(Object,
 #' @param AnnoName Name of cell annotation
 #'
 #' @examples
-#' heatmap(SeuratObj, DocTopMat, "Topic_16", SeuratObj$annotation, "NameOfAnnotation")
+#' HeatmapSortByTopic(SeuratObj, DocTopMat, "Topic_16", SeuratObj$annotation, "NameOfAnnotation")
 #'
 #' @return pheatmap object
 #'
@@ -99,7 +113,7 @@ heatmap <- function(Object,
 #' @import RColorBrewer
 
 
-heatmapSortByTopic  <- function(Object,
+HeatmapSortByTopic  <- function(Object,
                                 topics,
                                 sortByTopic =  "Topic_1",
                                 AnnoVector, AnnoName) {
@@ -117,7 +131,7 @@ heatmapSortByTopic  <- function(Object,
   #Add annotation color information to topics
   topics <- data.matrix(topics[order(topics[,sortByTopic]),])
 
-  #plot heatmap
+  #plot Heatmap
   p1 <- pheatmap(topics,
                  hclustfun = function(x) hclust(x, method="ward.D2"),
                  scale = "row",
@@ -135,7 +149,7 @@ heatmapSortByTopic  <- function(Object,
 #' Topic Heatmap - sorted by topic and annotation
 #'
 #'
-#' This function produces a heatmap showing how much each cell lies within each topic. The cells in the heatmap are sorted based on their scores in a given topic. The annotations are also sorted by their values.
+#' This function produces a Heatmap showing how much each cell lies within each topic. The cells in the Heatmap are sorted based on their scores in a given topic. The annotations are also sorted by their values.
 #'
 #' @param Object Seurat object containing the data the model was created with.
 #' @param topics document-topic matrix
@@ -144,7 +158,7 @@ heatmapSortByTopic  <- function(Object,
 #' @param AnnoName Name of cell annotation
 #'
 #' @examples
-#' heatmap(SeuratObj, DocTopMat, "Topic_16", SeuratObj$annotation, "NameOfAnnotation")
+#' HeatmapSortByTopicAsWellAsAnno(SeuratObj, DocTopMat, "Topic_16", SeuratObj$annotation, "NameOfAnnotation")
 #'
 #' @return pheatmap object
 #'
@@ -155,7 +169,7 @@ heatmapSortByTopic  <- function(Object,
 #' @import RColorBrewer
 
 
-heatmapSortByTopicAsWellAsAnno  <- function(Object,
+HeatmapSortByTopicAsWellAsAnno  <- function(Object,
                                             topics,
                                             sortByTopic =  "Topic_1",
                                             AnnoVector, AnnoName) {
@@ -173,7 +187,7 @@ heatmapSortByTopicAsWellAsAnno  <- function(Object,
   #Add annotation color information to topics
   topics <- data.matrix(topics[order( anno_col[,1], topics[,sortByTopic]),])
 
-  #plot heatmap
+  #plot Heatmap
   p1 <- pheatmap(topics,
                  hclustfun = function(x) hclust(x, method="ward.D2"),
                  scale = "row",
@@ -189,51 +203,51 @@ heatmapSortByTopicAsWellAsAnno  <- function(Object,
 
 
 
-#' Clustered Topic Heatmap
+#' #' Clustered Topic Heatmap
+#' #'
+#' #'
+#' #' This function produces a heatmap where the columns are clustered based on the expression pattern of the topics
+#' #'
+#' #' @param Object Seurat object containing the data the model was created with.
+#' #' @param topics document-topic matrix
+#' #' @param AnnoVector Vector of cell annotations
+#' #' @param AnnoName Name of cell annotation
+#' #'
+#' #' @examples
+#' #' heatmap(SeuratObj, DocTopMat, SeuratObj$annotation, "NameOfAnnotation")
+#' #'
+#' #' @return pheatmap object
+#' #'
+#' #'
+#' #' @export
+#' #'
+#' #' @import pheatmap
+#' #' @import RColorBrewer
 #'
+#' heatmapClusterTopics <- function(Object,
+#'                                  topics,
+#'                                  AnnoVector,
+#'                                  AnnoName) {
+#'   anno_col <- data.frame(row.names = colnames(Object),
+#'                          Column1=AnnoVector)
+#'   colnames(anno_col) <- AnnoName
+#'   num_colors = length(unique(anno_col[,1]))
+#'   anno_colors = gg_color_hue(num_colors)
+#'   names(anno_colors) <- sort(unique(anno_col[,1]))
+#'   anno_colors <- list(Cluster = anno_colors)
+#'   names(anno_colors) <- AnnoName
 #'
-#' This function produces a heatmap where the columns are clustered based on the expression pattern of the topics
+#'   topics <- data.matrix(topics[order(anno_col[,1]),])
 #'
-#' @param Object Seurat object containing the data the model was created with.
-#' @param topics document-topic matrix
-#' @param AnnoVector Vector of cell annotations
-#' @param AnnoName Name of cell annotation
-#'
-#' @examples
-#' heatmap(SeuratObj, DocTopMat, SeuratObj$annotation, "NameOfAnnotation")
-#'
-#' @return pheatmap object
-#'
-#'
-#' @export
-#'
-#' @import pheatmap
-#' @import RColorBrewer
-
-heatmapClusterTopics <- function(Object,
-                                 topics,
-                                 AnnoVector,
-                                 AnnoName) {
-  anno_col <- data.frame(row.names = colnames(Object),
-                         Column1=AnnoVector)
-  colnames(anno_col) <- AnnoName
-  num_colors = length(unique(anno_col[,1]))
-  anno_colors = gg_color_hue(num_colors)
-  names(anno_colors) <- sort(unique(anno_col[,1]))
-  anno_colors <- list(Cluster = anno_colors)
-  names(anno_colors) <- AnnoName
-
-  topics <- data.matrix(topics[order(anno_col[,1]),])
-
-  p1 <- pheatmap(topics,
-                 hclustfun = function(x) hclust(x, method="ward.D2"),
-                 scale = "row",
-                 cluster_cols = T,
-                 cluster_rows = F,show_rownames = F,
-                 col=colorRampPalette(rev(brewer.pal(11, "RdBu"))[c(1:4,8:11)])(256),
-                 annotation_row = anno_col,
-                 annotation_names_row = T,
-                 annotation_colors = anno_colors,
-                 cex=1)
-  return(p1)
-}
+#'   p1 <- pheatmap(topics,
+#'                  hclustfun = function(x) hclust(x, method="ward.D2"),
+#'                  scale = "row",
+#'                  cluster_cols = T,
+#'                  cluster_rows = F,show_rownames = F,
+#'                  col=colorRampPalette(rev(brewer.pal(11, "RdBu"))[c(1:4,8:11)])(256),
+#'                  annotation_row = anno_col,
+#'                  annotation_names_row = T,
+#'                  annotation_colors = anno_colors,
+#'                  cex=1)
+#'   return(p1)
+#' }

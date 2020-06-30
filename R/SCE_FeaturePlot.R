@@ -18,7 +18,7 @@
 #' @export
 #'
 #' @import Seurat
- 
+
 
 SCE_FeaturePlot <- function(object, pt.size, topics, ncol, min.cutoff) {
   temp_SO <- as.Seurat(object, counts = names(object@assays)[1])

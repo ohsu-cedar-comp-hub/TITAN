@@ -12,13 +12,17 @@ runLDA(
   varFeatures = 5000,
   iterations = 500,
   burnin = 250,
-  seed.number = 8
+  seed.number = 8,
+  parallel = F,
+  outDir = NULL,
+  cores = 1,
+  normalizationMethod = "CLR"
 )
 }
 \arguments{
 \item{Object}{Object containing the data the model was created with.}
 
-\item{ntopics}{Number of topics to be used in the model}
+\item{ntopics}{Number of topics to be used in the model. If parallel == TRUE, a vector of topics to run should be inputted}
 
 \item{alpha}{the value for alpha in the LDA model}
 
@@ -31,6 +35,14 @@ runLDA(
 \item{burnin}{number of iterations to run to allow the model to learn before calculating certain statistics. Models start at random points, so this allows model to get closer to the fit before certain statistics are calculated.}
 
 \item{seed.number}{random integer to set seed}
+
+\item{parallel}{if TRUE, will run multiple models in parallel}
+
+\item{outDir}{if parallel = TRUE, the output directory for the multiple models}
+
+\item{cores}{Number of cores to use, only applicable if parallel = TRUE}
+
+\item{normalizationMethod}{Normalization method used by Seurat NormalizeData. Options are CLR, LogNormalize and RC.}
 }
 \value{
 LDA Model
