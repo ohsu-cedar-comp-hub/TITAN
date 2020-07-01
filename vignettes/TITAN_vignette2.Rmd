@@ -5,10 +5,6 @@ output:
   github_document:
     toc: true
     toc_depth: 5
-vignette: >
-  %\VignetteIndexEntry{TITAN Tutorial}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -68,7 +64,7 @@ LDAelbowPlot("output_directory", SeuratObj)
 
 ```
 
-![Elbow Plot](../data/Elbowplot_T47D_PEPE.png){ width=40% }
+![Elbow Plot](/Users/chitsaza/Box Sync/Alex_Data/MCF7/Package/TITAN/data/Elbowplot_T47D_PEPE.png){ width=40% }
 
 
 ## Analyzing Models
