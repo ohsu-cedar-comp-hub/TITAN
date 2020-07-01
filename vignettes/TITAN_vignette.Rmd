@@ -179,66 +179,66 @@ DimPlot(SO,
         group.by = "hash.ID")        
 
 ```
-### Using a SingleCellExperiment Object
+<!-- ### Using a SingleCellExperiment Object -->
 
-Building the model is ran the same way,
+<!-- Building the model is ran the same way, -->
 
-```{r}
-SCE <- readRDS("../data/PEPE_T47D_SCE.rds")
-```
+<!-- ```{r} -->
+<!-- SCE <- readRDS("../data/PEPE_T47D_SCE.rds") -->
+<!-- ``` -->
 
-Running a single model,
+<!-- Running a single model, -->
 
-```{r eval = F}
-LDA_model <- runLDA(SCE, ntopics = 50)
+<!-- ```{r eval = F} -->
+<!-- LDA_model <- runLDA(SCE, ntopics = 50) -->
 
-```
+<!-- ``` -->
 
-Running multiple models,
+<!-- Running multiple models, -->
 
-```{r eval = F}
-parallel_runLDA(SCE, "output_directory", top_start = 5, top_end = 50, step = 5)
+<!-- ```{r eval = F} -->
+<!-- parallel_runLDA(SCE, "output_directory", top_start = 5, top_end = 50, step = 5) -->
 
-```
+<!-- ``` -->
 
-Checking the number of topics through an Elbow plot
+<!-- Checking the number of topics through an Elbow plot -->
 
-```{r eval = F}
-LDAelbowPlot("output_directory", SCE)
+<!-- ```{r eval = F} -->
+<!-- LDAelbowPlot("output_directory", SCE) -->
 
-```
+<!-- ``` -->
 
-![Elbow Plot](../data/Elbowplot_T47D_PEPE_SCE.png){ width=40% }
+<!-- ![Elbow Plot](../data/Elbowplot_T47D_PEPE_SCE.png){ width=40% } -->
 
-Loading in the pre-built model using the same number of topics as before,
+<!-- Loading in the pre-built model using the same number of topics as before, -->
 
-```{r}
-SCE_model <- readRDS("../data/Model_SCE_PEPE_T47D_20T.rds")
-```
+<!-- ```{r} -->
+<!-- SCE_model <- readRDS("../data/Model_SCE_PEPE_T47D_20T.rds") -->
+<!-- ``` -->
 
-This model will be slightly different than the one ran using the Seurat object. This is due to the SingleCellExperiment workflow using a slightly different feature space. However, the results remain mostly the same.
+<!-- This model will be slightly different than the one ran using the Seurat object. This is due to the SingleCellExperiment workflow using a slightly different feature space. However, the results remain mostly the same. -->
 
-```{r}
-SCE <- addTopicsToSCE(SCE_model, SCE)
+<!-- ```{r} -->
+<!-- SCE <- addTopicsToSCE(SCE_model, SCE) -->
 
-```
+<!-- ``` -->
 
 
-```{r, fig.width=8, fig.height=8}
-SCE_topics <- GetTopics(SCE_model, SCE)
-heatmap(SCE, SCE_topics, SCE@colData@listData$hash.ID, "Timepoint")
+<!-- ```{r, fig.width=8, fig.height=8} -->
+<!-- SCE_topics <- GetTopics(SCE_model, SCE) -->
+<!-- heatmap(SCE, SCE_topics, SCE@colData@listData$hash.ID, "Timepoint") -->
 
-```
+<!-- ``` -->
 
-```{r, warning=F, fig.width=8, fig.height=6}
-SCE_FeaturePlot(SCE, pt.size = 0.01, topics = 1:8, ncol = 4, min.cutoff = 'q5')
-SCE_FeaturePlot(SCE, pt.size = 0.01, topics = 9:16, ncol = 4, min.cutoff = 'q5')
-```
+<!-- ```{r, warning=F, fig.width=8, fig.height=6} -->
+<!-- SCE_FeaturePlot(SCE, pt.size = 0.01, topics = 1:8, ncol = 4, min.cutoff = 'q5') -->
+<!-- SCE_FeaturePlot(SCE, pt.size = 0.01, topics = 9:16, ncol = 4, min.cutoff = 'q5') -->
+<!-- ``` -->
 
-```{r echo = F, warning=F, fig.width=8, fig.height=3}
-SCE_FeaturePlot(SCE, pt.size = 0.01, topics = 17:20, ncol = 4, min.cutoff = 'q5')
+<!-- ```{r echo = F, warning=F, fig.width=8, fig.height=3} -->
+<!-- SCE_FeaturePlot(SCE, pt.size = 0.01, topics = 17:20, ncol = 4, min.cutoff = 'q5') -->
 
-```
+<!-- ``` -->
 
 
 
