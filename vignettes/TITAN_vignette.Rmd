@@ -1,14 +1,13 @@
 ---
 title: "TITAN Tutorial"
-always_allow_html: yes  
-output: 
+output:
+  rmarkdown::html_vignette: default
   github_document:
-    toc: true
+    toc: yes
     toc_depth: 5
-vignette: >
-  %\VignetteIndexEntry{TITAN Tutorial}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+always_allow_html: yes
+vignette: |
+  %\VignetteIndexEntry{TITAN Tutorial} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -61,7 +60,7 @@ The above command will run 10 instances of the `runLDA` function starting with o
 
 ## Elbow Plot nTopics
 
-Now the task is to determine which of these models is the ideal one to use in downstream analysis. To do this we have developed our own version of an Elbow plot.
+Now the task is to determine which of these models is the ideal one to use in downstream analysis. To do this we have developed our own version of an Elbow plot. This elbow plot looks at the perplexity of each model, a measure how well the model fits the data while also giving models that use less parameters a higher score. The Y axis of the plot is the RPC (rate of perplexity change), which looks at how much the perplexity changes as the topic number increases. This method is based off [this](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-16-S13-S8) paper by Zhao et al.
 
 ```{r eval = F}
 LDAelbowPlot("output_directory", SeuratObj)
@@ -81,8 +80,8 @@ Now that we have built a model and determine that it does a good job of capturin
 First, read in the Seurat object RDS and the model RDS.
 
 ```{r}
-SO <- readRDS("~/Box Sync/Alex_Data/MCF7/PEPE/RDS/PEPE_T47D.rds")
-top_model <- readRDS("~/Box Sync/Alex_Data/MCF7/PEPE/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
+SO <- readRDS("../data/PEPE_T47D.rds")
+top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
 ```
 
 

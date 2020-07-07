@@ -4,20 +4,9 @@
 \alias{runLDA}
 \title{Runs LDA Model}
 \usage{
-runLDA(
-  Object,
-  ntopics,
-  alpha = 50,
-  beta = 0.1,
-  varFeatures = 5000,
-  iterations = 500,
-  burnin = 250,
-  seed.number = 8,
-  parallel = F,
-  outDir = NULL,
-  cores = 1,
-  normalizationMethod = "CLR"
-)
+runLDA(Object, ntopics, alpha = 50, beta = 0.1, varFeatures = 5000,
+  iterations = 500, burnin = 250, seed.number = 8, parallel = F,
+  outDir = NULL, cores = 1, normalizationMethod = "CLR")
 }
 \arguments{
 \item{Object}{Object containing the data the model was created with.}
@@ -36,7 +25,7 @@ runLDA(
 
 \item{seed.number}{random integer to set seed}
 
-\item{parallel}{if TRUE, will run multiple models in parallel}
+\item{parallel}{if TRUE, will run multiple models in parallel. NOT AVAILABLE ON WINDOWS}
 
 \item{outDir}{if parallel = TRUE, the output directory for the multiple models}
 

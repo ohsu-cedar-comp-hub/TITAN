@@ -11,7 +11,7 @@
 #' @param varFeatures the number of variable features to use in the LDA model. The more features that are used, the slower the model will run and the more noise that will be introduced, but the model will be more complete in representing your entire dataset.
 #' @param iterations the number of iterations used when learning the LDA model.
 #' @param burnin number of iterations to run to allow the model to learn before calculating certain statistics. Models start at random points, so this allows model to get closer to the fit before certain statistics are calculated.
-#' @param parallel if TRUE, will run multiple models in parallel
+#' @param parallel if TRUE, will run multiple models in parallel. NOT AVAILABLE ON WINDOWS
 #' @param outDir if parallel = TRUE, the output directory for the multiple models
 #' @param cores Number of cores to use, only applicable if parallel = TRUE
 #' @param seed.number random integer to set seed
