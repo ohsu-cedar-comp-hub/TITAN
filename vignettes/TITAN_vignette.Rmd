@@ -39,6 +39,8 @@ The first is running a single LDA model on the data. This process has two steps.
 
 ### Single topic
 ```{r eval = F}
+SeuratObj <- readRDS("../data/PEPE_T47D.rds")
+
 LDA_model <- runLDA(SeuratObj, ntopics = 50, normalizationMethod = "CLR")
 
 ```
@@ -80,7 +82,7 @@ Now that we have built a model and determine that it does a good job of capturin
 First, read in the Seurat object RDS and the model RDS.
 
 ```{r}
-SO <- readRDS("../data/PEPE_T47D.rds")
+SeuratObj <- readRDS("../data/PEPE_T47D.rds")
 top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
 ```
 
@@ -88,7 +90,7 @@ top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
 The first step in the analysis pipeline is to add the topic information to the original Seurat object. This allows us to employ many of Seurat's built in plot functions to visualize the model.
 
 ```{r}
-SO <- addTopicsToSeuratObject(model = top_model, Object = SO)
+SeuratObj <- addTopicsToSeuratObject(model = top_model, Object = SeuratObj)
 ```
 
 
@@ -119,12 +121,12 @@ The second distrubtion that TITAN outputs is the cell-topic distrubition which o
 
 ``` {r,}
 ## Using the get topics function
-LDA_topics <- GetTopics(top_model, SO)
+LDA_topics <- GetTopics(top_model, SeuratObj)
 head(LDA_topics)
 
 ## Using the meta data columns (must run addTopicsToSeruatObject() first)
 library(tidyverse)
-LDA_topics <- SO@meta.data %>% select(starts_with("Topic"))
+LDA_topics <- SeuratObj@meta.data %>% select(starts_with("Topic"))
 head(LDA_topics)
 ```
 
@@ -136,9 +138,9 @@ head(LDA_topics)
 Although, the cell-topic matrix contains valuable infomration about each cells contribution to each topic. It is often hard to parse. For this reason, it is nice to visualize which cells contribute to each topic and how each topic compares to eachother.To do this, we recommend visualizing the cell-topic matrix in heatmap form. The goal is to see which cells express which topics. The `heatmap` function allows one to plot the topics across a heatmap and sort the cells by a column of interest. In our case, we are wondering whihch topics are associated with each treatment so we will be annotating the function with our treatment column, but one could use any other metadata column
 
 ```{r, fig.width=8, fig.height=8}
-HeatmapTopic(Object = SO,
+HeatmapTopic(Object = SeuratObj,
         topics =  LDA_topics,
-        AnnoVector = SO@meta.data$hash.ID,
+        AnnoVector = SeuratObj@meta.data$hash.ID,
         AnnoName = "Time Point")
 
 
@@ -147,9 +149,9 @@ HeatmapTopic(Object = SO,
 You can also cluster the topics of the heatmap so that topics with similar expression patterns across cells are grouped together.
 
 ```{r, fig.width=8, fig.height=8}
-HeatmapTopic(Object = SO,
+HeatmapTopic(Object = SeuratObj,
              topics =  LDA_topics,
-             AnnoVector = SO@meta.data$hash.ID,
+             AnnoVector = SeuratObj@meta.data$hash.ID,
              AnnoName = "Time Point",
              clusterTopics = T)
 
@@ -158,9 +160,9 @@ HeatmapTopic(Object = SO,
 In both of the above cases, the rows of the heatmap were sorted by time point. They can be sorted by any metadata column in the Seurat object as well, such as cluster.
 
 ```{r, fig.width=8, fig.height=8}
-HeatmapTopic(Object = SO,
+HeatmapTopic(Object = SeuratObj,
              topics =   LDA_topics, 
-             AnnoVector = SO$seurat_clusters, 
+             AnnoVector = SeuratObj$seurat_clusters, 
              AnnoName = "Cluster")
 
 
@@ -172,11 +174,11 @@ HeatmapTopic(Object = SO,
 Another way to visualize the expression of the topics is through Seurat's FeaturePlot function. This plots the cells using the UMAP embeddings within the Seurat object, and then colors the cells based on their expression of the given topic.
 
 ```{r, fig.width=8, fig.height=6}
-FeaturePlot(SO, 
+FeaturePlot(SeuratObj, 
             pt.size = 0.01, 
             features  = "Topic_1", 
             min.cutoff = 'q1')
-FeaturePlot(SO, 
+FeaturePlot(SeuratObj, 
             pt.size = 0.01, 
             features  = paste("Topic", 13:20, sep = "_"), 
             ncol = 4, 
@@ -190,7 +192,7 @@ FeaturePlot(SO,
 Further, we find it also useful to plot two LDA topics against eachother when trying to compare how cells react to different tracriptional topics. An example being in our T47D expriment, we were interested in how the progestorne-specific topic (Topic 1) and an estrogen-specific topic (Topic 17) segregate out cells by treatment. To do this, we can plot the scores of the two topics using the `DimPlot` function in Seurat. When running `addTopicsToSeruatObject`, the function creates a DimReducObject under the name "lda" which can be used to plot the two against eachother. 
 
 ```{r, fig.width=8, fig.height=6}
-DimPlot(SO, 
+DimPlot(SeuratObj, 
         pt.size = 0.01, 
         reduction = "lda", 
         dims = c(17,1),
@@ -199,7 +201,7 @@ DimPlot(SO,
 
 Further, if one wanted to visualize the expression of a gene across two topic gradients one could also utalize the `FeaturePlot` function using the "lda" reduction as shown below. 
 ``` {r, fig.width=8, fig.height=6}
-FeaturePlot(SO, 
+FeaturePlot(SeuratObj, 
         pt.size = 0.01, 
         reduction = "lda", 
         dims = c(17,1),
@@ -211,7 +213,7 @@ FeaturePlot(SO,
 Another example of how one could look at the data would be to see how two topics that have similar patterns differ from eachother. If one looks back at the heatmap, topics 11 and topics 17 both showed high expression at the late estrogen timepoint, yet when ploted against eachother one can see a start pattern of cells that either undergo one topic or the other, but uncommon for both topics to be high in the same cell.
 
 ``` {r, fig.width=8, fig.height=6}
-DimPlot(SO, 
+DimPlot(SeuratObj, 
         pt.size = 0.01, 
         reduction = "lda", 
         dims = c(11,17),
