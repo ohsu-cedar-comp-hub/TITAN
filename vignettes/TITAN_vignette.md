@@ -60,7 +60,7 @@ other parameters. More info about these parameters can be found at
 multiple hours to run, so it is important to make sure you have the
 necessary computational resources.
 
-#### Multiple Topics
+### Multiple Topics
 
 The second option is to use the parallel option of the `runLDA`
 function. This is for users that may not know how many topics they want
@@ -82,7 +82,7 @@ output directory.
 
 ## Evaluating Models
 
-## Elbow Plot nTopics
+### Elbow Plot nTopics
 
 Now the task is to determine which of these models is the ideal one to
 use in downstream analysis. To do this we have developed our own version
@@ -269,9 +269,9 @@ kable(head(LDA_topics[,11:20]))
 | AAACGCTAGATTACCC\_1 | \-1.2417767 | \-0.0744146 |   1.1255470 | \-1.1598774 | \-1.5927418 |   0.1226246 | \-1.0731378 |   0.3595397 | \-0.6487037 |   0.9448876 |
 | AAACGCTAGGCGTTGA\_1 | \-1.3802540 | \-0.6446064 |   1.9130660 | \-0.7307870 | \-1.6223023 |   1.1186540 | \-0.3495828 | \-0.2228788 |   0.1040392 | \-0.3297034 |
 
-### Visualizing Topics
+## Visualizing Topics
 
-## Heatmap
+### Heatmap
 
 Although, the cell-topic matrix contains valuable infomration about each
 cells contribution to each topic. It is often hard to parse. For this
@@ -319,7 +319,7 @@ HeatmapTopic(Object = SeuratObj,
 
 ![](TITAN_vignette_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
-## On UMAP
+### On UMAP
 
 Another way to visualize the expression of the topics is through
 Seurat’s FeaturePlot function. This plots the cells using the UMAP

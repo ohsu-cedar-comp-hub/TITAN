@@ -47,7 +47,7 @@ LDA_model <- runLDA(SeuratObj, ntopics = 50, normalizationMethod = "CLR")
 
 This will return an LDA model with 50 topics, created using the default alpha and beta values, as well as the default values for a number of other parameters. More info about these parameters can be found at `?runLDA`.min Depending on the size of your data, this function can take multiple hours to run, so it is important to make sure you have the necessary computational resources. 
 
-#### Multiple Topics
+### Multiple Topics
 
 The second option is to use the parallel option of the `runLDA` function. This is for users that may not know how many topics they want in their model. This function does the same thing as above, but a number of times in parallel, each time using a different number of topics. Now the `ntopics` argument takes a vector of numbers and the function will produce a new model for every number of topics in the list.
 
@@ -60,7 +60,7 @@ The above command will run 10 instances of the `runLDA` function starting with o
 
 ## Evaluating Models
 
-## Elbow Plot nTopics
+### Elbow Plot nTopics
 
 Now the task is to determine which of these models is the ideal one to use in downstream analysis. To do this we have developed our own version of an Elbow plot. This elbow plot looks at the perplexity of each model, a measure how well the model fits the data while also giving models that use less parameters a higher score. The Y axis of the plot is the RPC (rate of perplexity change), which looks at how much the perplexity changes as the topic number increases. This method is based off [this](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-16-S13-S8) paper by Zhao et al.
 
@@ -134,9 +134,9 @@ kable(head(LDA_topics[,11:20]))
 ```
 
 
-### Visualizing Topics 
+## Visualizing Topics 
 
-## Heatmap
+### Heatmap
 
 Although, the cell-topic matrix contains valuable infomration about each cells contribution to each topic. It is often hard to parse. For this reason, it is nice to visualize which cells contribute to each topic and how each topic compares to eachother.To do this, we recommend visualizing the cell-topic matrix in heatmap form. The goal is to see which cells express which topics. The `heatmap` function allows one to plot the topics across a heatmap and sort the cells by a column of interest. In our case, we are wondering whihch topics are associated with each treatment so we will be annotating the function with our treatment column, but one could use any other metadata column
 
@@ -172,7 +172,7 @@ HeatmapTopic(Object = SeuratObj,
 ```
 
 
-## On UMAP
+### On UMAP
 
 Another way to visualize the expression of the topics is through Seurat's FeaturePlot function. This plots the cells using the UMAP embeddings within the Seurat object, and then colors the cells based on their expression of the given topic.
 
