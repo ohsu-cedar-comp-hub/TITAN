@@ -202,7 +202,7 @@ kable(head(TopicGenes[,11:20], 10))
 | UBE2S     | SLBP      | CPE       | HNRNPA2B1 | DUT       | CD24      | CA12      | TUBA4A    | GAPDH     | IGFBP5    |
 | HMMR      | SRSF2     | CYB5A     | NUCKS1    | MCM3      | HSD17B1   | LY6E      | S100A6    | HSPB11    | CEP350    |
 
-## Cell-Topic Distribution
+### Cell-Topic Distribution
 
 The second distrubtion that TITAN outputs is the cell-topic distrubition
 which outputs the contribution each cell belongs to a topic, calculated

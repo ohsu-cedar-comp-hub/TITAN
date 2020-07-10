@@ -117,7 +117,7 @@ kable(head(TopicGenes[,1:10], 10))
 kable(head(TopicGenes[,11:20], 10))
 ```
 
-## Cell-Topic Distribution
+### Cell-Topic Distribution
 
 The second distrubtion that TITAN outputs is the cell-topic distrubition which outputs the contribution each cell belongs to a topic, calculated from the gene scores. The `GetTopics` function outputs a scaled cell-topic matrix. Alternatively, the `addTopicsToSeuratObject` function added this cell-topic matrix to our metadata files so if that has been run it can also be done by wrangling the meta.data in your Seurat object.
 
