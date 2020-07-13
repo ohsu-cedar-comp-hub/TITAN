@@ -6,4 +6,4 @@ TITAN is a tool used to analyze single-cell RNA sequencing data. It is an altern
 
 
 
-Tutorial on hormone treatments in breast cancer can be found [here](https://github.com/AlexChitsazan/TITAN/blob/master/vignettes/TITAN_vignette.md)
+Tutorial on hormone treatments in breast cancer can be found [here](https://github.com/JuliusCampbell/TITAN/blob/master/vignettes/TITAN_vignette.md)
