@@ -34,13 +34,15 @@ library(knitr)
 
 In its current state, TITAN is built to work off of the R package `Seurat`. The first step in TITAN is to create a Seurat object containing your scRNA-seq data. This tutorial assumes that general QC has been run and poorly performing cells have been filtered out. Directions for that can be found in the vingette found [here](https://satijalab.org/seurat/v3.1/pbmc3k_tutorial.html). We also understand that there are other formats of single cell objects, such as SingleCellExpiriment. Seurat has documentation on conversion to SeuratObject from different types of objects found [here](https://satijalab.org/seurat/v3.1/conversion_vignette.html). Once you've done this, you can begin using TITAN. To begin building the model, the user has two options. 
 
+For this tutorial, the Seurat object we will be using can be downloaded as an RDS object from [thislink](https://www.dropbox.com/s/9lmst5aou3l0ipk/PEPE_T47D.rds?dl=0). This is a cancer cell line hormonal treatment time course. The dataset contains T47D single cells, some treated with estrogen, some treated with progesterone, and some treated with both estrogen and progesterone (which we refer to as PEPE treatment).
+
 ## Building a Model
 
 The first is running a single LDA model on the data. This process has two steps. First is to normalize the data. We do this using Seurats normalize data function with the added recommendation that one uses the centered log-ratio (CLR) transformation due to the varying levels of gene expression seen per cell and topic modeling's preference for genes that have high counts. 
 
 ### Single topic
 ```{r eval = F}
-# SeuratObj <- readRDS("../data/PEPE_T47D.rds")
+SeuratObj <- readRDS("PEPE_T47D.rds")
 LDA_model <- runLDA(SeuratObj, ntopics = 50, normalizationMethod = "CLR")
 
 ```
@@ -74,19 +76,21 @@ LDAelbowPlot("output_directory", SeuratObj)
 
 ## Analyzing Models
 
-Now that we have built a model and determine that it does a good job of capturing our data, we can analyze the model. For the rest of the vignette, we will be using a model with 20 topics that was built on a dataset containing T47D single cells, some treated with estrogen, some treated with progesterone, and some treated with both estrogen and progesterone.
+Now that we have built a model and determine that it does a good job of capturing our data, we can analyze the model. For the rest of the vignette, we will be using a model with 20 topics that was built on the dataset.
 
 
 ### Load Data 
 
-First, read in the model RDS.
+First, read in the model RDS you just generated.
 
-```{r}
-# top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
-top_model <- readRDS("~/Box Sync/Alex_Data/MCF7/PEPE/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
-SeuratObj<- readRDS("~/Box Sync/Alex_Data/MCF7/PEPE/RDS/PEPE_T47D.rds")
+```{r, eval = F, }
+top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
 ```
 
+```{r, eval = T, include = F}
+SeuratObj <- readRDS("~/Box Sync/Alex_Data/MCF7/PEPE/RDS/PEPE_T47D.rds")
+top_model <- readRDS("~/Box Sync/Alex_Data/MCF7/PEPE/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
+```
 
 The first step in the analysis pipeline is to add the topic information to the original Seurat object. This allows us to employ many of Seurat's built in plot functions to visualize the model.
 

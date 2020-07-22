@@ -37,6 +37,14 @@ SeuratObject from different types of objects found
 you’ve done this, you can begin using TITAN. To begin building the
 model, the user has two options.
 
+For this tutorial, the Seurat object we will be using can be downloaded
+as an RDS object from
+[thislink](https://www.dropbox.com/s/9lmst5aou3l0ipk/PEPE_T47D.rds?dl=0).
+This is a cancer cell line hormonal treatment time course. The dataset
+contains T47D single cells, some treated with estrogen, some treated
+with progesterone, and some treated with both estrogen and progesterone
+(which we refer to as PEPE treatment).
+
 ## Building a Model
 
 The first is running a single LDA model on the data. This process has
@@ -49,7 +57,7 @@ that have high counts.
 ### Single topic
 
 ``` r
-# SeuratObj <- readRDS("../data/PEPE_T47D.rds")
+SeuratObj <- readRDS("PEPE_T47D.rds")
 LDA_model <- runLDA(SeuratObj, ntopics = 50, normalizationMethod = "CLR")
 ```
 
@@ -104,20 +112,16 @@ LDAelbowPlot("output_directory", SeuratObj)
 
 Now that we have built a model and determine that it does a good job of
 capturing our data, we can analyze the model. For the rest of the
-vignette, we will be using a model with 20 topics that was built on a
-dataset containing T47D single cells, some treated with estrogen, some
-treated with progesterone, and some treated with both estrogen and
-progesterone.
+vignette, we will be using a model with 20 topics that was built on the
+dataset.
 
 ### Load Data
 
-First, read in the model
-RDS.
+First, read in the model RDS you just
+generated.
 
 ``` r
-# top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
-top_model <- readRDS("~/Box Sync/Alex_Data/MCF7/PEPE/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
-SeuratObj<- readRDS("~/Box Sync/Alex_Data/MCF7/PEPE/RDS/PEPE_T47D.rds")
+top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
 ```
 
 The first step in the analysis pipeline is to add the topic information
@@ -291,7 +295,7 @@ HeatmapTopic(Object = SeuratObj,
         AnnoName = "Time Point")
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 You can also cluster the topics of the heatmap so that topics with
 similar expression patterns across cells are grouped together.
@@ -304,7 +308,7 @@ HeatmapTopic(Object = SeuratObj,
              clusterTopics = T)
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 In both of the above cases, the rows of the heatmap were sorted by time
 point. They can be sorted by any metadata column in the Seurat object as
@@ -317,7 +321,7 @@ HeatmapTopic(Object = SeuratObj,
              AnnoName = "Cluster")
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ### On UMAP
 
@@ -333,7 +337,7 @@ FeaturePlot(SeuratObj,
             min.cutoff = 'q1')
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 FeaturePlot(SeuratObj, 
@@ -343,7 +347,7 @@ FeaturePlot(SeuratObj,
             min.cutoff = 'q1')
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-15-2.png)<!-- -->
 
 ## Plotting two LDA topics against eachother
 
@@ -367,7 +371,7 @@ DimPlot(SeuratObj,
         group.by = "hash.ID")    
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ### Visualizing Expression within network gradients
 
@@ -384,7 +388,7 @@ FeaturePlot(SeuratObj,
         min.cutoff = 'q1')        
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 Another example of how one could look at the data would be to see how
 two topics that have similar patterns differ from eachother. If one
@@ -402,7 +406,7 @@ DimPlot(SeuratObj,
         group.by = "hash.ID")        
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 <!-- ### Using a SingleCellExperiment Object -->
 
 <!-- Building the model is ran the same way, -->
