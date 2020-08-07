@@ -15,7 +15,6 @@ knitr::opts_chunk$set(
   comment = "#>",
   cache=T
 )
-library(knitr)
 ```
 
 
@@ -26,18 +25,11 @@ library(knitr)
 
 ## Object Setup
 
-## Package loading and installation 
-
-```{r, eval = F}
-install.packages("devtools")
-devtools::install_github('JuliusCampbell/TITAN')
-```
-
-
 ```{r message = F, warning=F}
 library(TITAN)
 library(Seurat)
 library(tidyverse)
+library(knitr)
 ```
 
 In its current state, TITAN is built to work off of the R package `Seurat`. The first step in TITAN is to create a Seurat object containing your scRNA-seq data. This tutorial assumes that general QC has been run and poorly performing cells have been filtered out. Directions for that can be found in the vingette found [here](https://satijalab.org/seurat/v3.1/pbmc3k_tutorial.html). We also understand that there are other formats of single cell objects, such as SingleCellExpiriment. Seurat has documentation on conversion to SeuratObject from different types of objects found [here](https://satijalab.org/seurat/v3.1/conversion_vignette.html). Once you've done this, you can begin using TITAN. To begin building the model, the user has two options. 
@@ -233,7 +225,7 @@ FeaturePlot(SeuratObj,
 Another example of how one could look at the data would be to see how two topics that have similar patterns differ from eachother. If one looks back at the heatmap, topics 11 and topics 17 both showed high expression at the late estrogen timepoint, yet when ploted against eachother one can see a start pattern of cells that either undergo one topic or the other, but uncommon for both topics to be high in the same cell.
 
 ``` {r, fig.width=8, fig.height=6}
-DimPlot(SeuratObj, 
+DimPlot(, 
         pt.size = 0.01, 
         reduction = "lda", 
         dims = c(11,17),
@@ -241,13 +233,25 @@ DimPlot(SeuratObj,
 
 ```
 
+### Visualizing Expression within network gradients
+
+Further, if one wanted to visualize the expression of a gene across two topic gradients one could also utalize the `FeaturePlot` function using the "lda" reduction as shown below. 
+``` {r, fig.width=8, fig.height=6}
+FeaturePlot(SeuratObj, 
+        pt.size = 0.01, 
+        reduction = "lda", 
+        dims = c(17,1),
+        features = "AZGP1",
+        min.cutoff = 'q1')        
+
+```
 
 
 ### Imputing Topics 
 
-In addition, because of the way that topic modeling works, comparisons of gene sets that are enriched in topics from different expiriments can be compared from dataset to dataset by looking at the expression of the top genes within the topic. We do this by using Seurat's `AddModuleScore` function which uses the method established by [Teirosh et al](https://science.sciencemag.org/content/352/6282/189). Here is an example of the same treatment timecourse in the MCF7 cell line (Same treatments P, E & EP). This allows one to visualize how the MCF7 topics are seen under the same conditions in the t47D cell line, One finding of note is that Topic 9 in the MCF7 samples was the Estrogen specific topic. Also interestingly, topic modeling by 20 topics for MCF7 did not locate a progestorone specific topic. 
+In addition, because of the way that topic modeling works, comparisons of gene sets that are enriched in topics from different expiriments can be compared from dataset to dataset by looking at the expression of the top genes within the topic. Here is an example of the same treatment timecourse in the MCF7 cell line (Same treatments P, E & EP). Interesting findings from this shows that Topic 9 in the MCF7 samples was the Estrogen specific topic. Also interestingly, topic modeling by 20 topics for MCF7 did not locate a progestorone specific topic. 
 
-```{r, fig.width=11, fig.height=8.5, warning=FALSE}
+```{r}
 DefaultAssay(SeuratObj) <- "RNA"
 SeuratObj <- ImputeAndAddTopics(SeuratObj, MCF7_top_model, TopicPrefix = "MCF7Imputed_Topic")
 HeatmapTopic(Object = SeuratObj,
@@ -258,9 +262,6 @@ HeatmapTopic(Object = SeuratObj,
 
 
 ```
-
-
-
 
 
 <!-- ### Using a SingleCellExperiment Object -->

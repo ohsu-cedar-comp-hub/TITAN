@@ -17,11 +17,17 @@ is assigned to a topic.
 
 ## Object Setup
 
+## Package loading and installation
+
+``` r
+install.packages("devtools")
+devtools::install_github('JuliusCampbell/TITAN')
+```
+
 ``` r
 library(TITAN)
 library(Seurat)
 library(tidyverse)
-library(knitr)
 ```
 
 In its current state, TITAN is built to work off of the R package
@@ -295,7 +301,7 @@ HeatmapTopic(Object = SeuratObj,
         AnnoName = "Time Point")
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 You can also cluster the topics of the heatmap so that topics with
 similar expression patterns across cells are grouped together.
@@ -308,7 +314,7 @@ HeatmapTopic(Object = SeuratObj,
              clusterTopics = T)
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 In both of the above cases, the rows of the heatmap were sorted by time
 point. They can be sorted by any metadata column in the Seurat object as
@@ -321,7 +327,7 @@ HeatmapTopic(Object = SeuratObj,
              AnnoName = "Cluster")
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ### On UMAP
 
@@ -337,7 +343,7 @@ FeaturePlot(SeuratObj,
             min.cutoff = 'q1')
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ``` r
 FeaturePlot(SeuratObj, 
@@ -347,7 +353,7 @@ FeaturePlot(SeuratObj,
             min.cutoff = 'q1')
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-15-2.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
 
 ## Plotting two LDA topics against eachother
 
@@ -371,7 +377,7 @@ DimPlot(SeuratObj,
         group.by = "hash.ID")    
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 ### Visualizing Expression within network gradients
 
@@ -388,7 +394,7 @@ FeaturePlot(SeuratObj,
         min.cutoff = 'q1')        
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 Another example of how one could look at the data would be to see how
 two topics that have similar patterns differ from eachother. If one
@@ -406,7 +412,34 @@ DimPlot(SeuratObj,
         group.by = "hash.ID")        
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+### Imputing Topics
+
+In addition, because of the way that topic modeling works, comparisons
+of gene sets that are enriched in topics from different expiriments can
+be compared from dataset to dataset by looking at the expression of the
+top genes within the topic. We do this by using Seurat’s
+`AddModuleScore` function which uses the method established by [Teirosh
+et al](https://science.sciencemag.org/content/352/6282/189). Here is an
+example of the same treatment timecourse in the MCF7 cell line (Same
+treatments P, E & EP). This allows one to visualize how the MCF7 topics
+are seen under the same conditions in the t47D cell line, One finding of
+note is that Topic 9 in the MCF7 samples was the Estrogen specific
+topic. Also interestingly, topic modeling by 20 topics for MCF7 did not
+locate a progestorone specific topic.
+
+``` r
+DefaultAssay(SeuratObj) <- "RNA"
+SeuratObj <- ImputeAndAddTopics(SeuratObj, MCF7_top_model, TopicPrefix = "MCF7Imputed_Topic")
+HeatmapTopic(Object = SeuratObj,
+             topics =   Embeddings(SeuratObj, "imputedLDA"), 
+             AnnoVector = SeuratObj@meta.data$hash.ID, 
+             AnnoName = "Cluster")
+```
+
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+
 <!-- ### Using a SingleCellExperiment Object -->
 
 <!-- Building the model is ran the same way, -->
