@@ -86,6 +86,8 @@ runLDA <- function(Object,
       burnin=burnin)[-1]
     if (parallel) {
       saveRDS(selected.Model, paste0(outDir, "/Model_", as.character(topics), "topics.rds"))
+    } else {
+      return(selected.Model)
     }
   }
   if (parallel) {
