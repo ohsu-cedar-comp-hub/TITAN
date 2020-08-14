@@ -20,6 +20,6 @@ Seurat object with updated metadata of imputed geneExpression
 This function adds the topic-document information as individual columns to the Seurat metadata for each topic
 }
 \examples{
-addTopicsToSeuratObject(LDAmodel, SeuratObj)
+ImputeAndAddTopics(SeuratObj, LDAmodel, TopicPrefix = "ImputedTopic")
 
 }

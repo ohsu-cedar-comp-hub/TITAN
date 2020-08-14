@@ -4,12 +4,14 @@
 \alias{LDAelbowPlot}
 \title{Topic Elbow Plot}
 \usage{
-LDAelbowPlot(model_dir, SO)
+LDAelbowPlot(model_dir, Object, varFeatures = 5000)
 }
 \arguments{
 \item{model_dir}{Directory containing the models created using a varying number of topics.}
 
-\item{SO}{Object containing the data the model was created with.}
+\item{Object}{Object containing the data the model was created with.}
+
+\item{VarFeatures}{the number of variable features to use in the LDA model. MUST MATCH WITH MODELS IN model_dir}
 }
 \value{
 ggplot object

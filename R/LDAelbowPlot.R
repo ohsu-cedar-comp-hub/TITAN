@@ -4,7 +4,8 @@
 #' This function helps to determine the proper number of topics to use in your LDA model. Plots the rate of perplexity change versus the number of topic. The ideal topic number is the "elbow" of the plot.
 #'
 #' @param model_dir Directory containing the models created using a varying number of topics.
-#' @param SO Object containing the data the model was created with.
+#' @param Object Object containing the data the model was created with.
+#' @param VarFeatures the number of variable features to use in the LDA model. MUST MATCH WITH MODELS IN model_dir
 #'
 #' @examples
 #' LDAelbowPlot(test_dir, SeuratObj)
@@ -21,7 +22,7 @@
 #' @import SingleCellExperiment
 
 LDAelbowPlot <- function(model_dir,
-                         SO) {
+                         Object, varFeatures = 5000) {
   files <- list.files(path = model_dir, pattern = "Model_")
 
   # Get model input data
@@ -30,15 +31,15 @@ LDAelbowPlot <- function(model_dir,
     Object        <- NormalizeData(Object, assay = "RNA", normalization.method = "CLR")
     Object        <- FindVariableFeatures(Object, assay = "RNA", nfeatures = varFeatures)
     Object.sparse <- GetAssayData(Object, slot = "data",assay = "RNA")
-    Object.sparse <- Object[VariableFeatures(Object, assay = "RNA"),]
-
+    Object.sparse <- Object.sparse[VariableFeatures(Object, assay = "RNA"),]
+   
     #convert data into the proper input format for lda.collapsed.gibbs.sampler
     data.use      <- Matrix::Matrix(Object.sparse, sparse = T)
   } else if (class(Object) == "SingleCellExperiment") {
     normalized_sce <- NormalizeData(assay(Object, "counts"), normalization.method = "CLR")
     varFeats <- FindVariableFeatures(normalized_sce)
     varFeats$gene <- rownames(varFeats)
-    varFeats <- top_n(varFeats, 5000, vst.variance.standardized)
+    varFeats <- top_n(varFeats, varFeatures, vst.variance.standardized)
 
     data.use <- Matrix::Matrix(normalized_sce[varFeats$gene,], sparse = T)
   } else (
@@ -70,6 +71,9 @@ LDAelbowPlot <- function(model_dir,
     doctopdist    <- LICORS::normalize(t(model$document_sums), byrow = T)
 
     #calculate perpelexity
+    print(ncol(topworddist))
+    print(ncol(doctopdist))
+    print(ncol(docterMat))
     perp          <- perplexity(docterMat, topworddist, doctopdist)
     perp_list     <- c(perp_list, perp)
 
