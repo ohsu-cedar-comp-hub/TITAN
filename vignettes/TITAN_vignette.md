@@ -45,7 +45,7 @@ model, the user has two options.
 
 For this tutorial, the Seurat object we will be using can be downloaded
 as an RDS object from
-[thislink](https://www.dropbox.com/s/9lmst5aou3l0ipk/PEPE_T47D.rds?dl=0).
+[thislink](https://www.dropbox.com/s/sjzt0720ijj0ycs/PEPE_T47D.rds?dl=0).
 This is a cancer cell line hormonal treatment time course. The dataset
 contains T47D single cells, some treated with estrogen, some treated
 with progesterone, and some treated with both estrogen and progesterone
@@ -64,7 +64,7 @@ that have high counts.
 
 ``` r
 SeuratObj <- readRDS("PEPE_T47D.rds")
-LDA_model <- runLDA(SeuratObj, ntopics = 50, normalizationMethod = "CLR")
+LDA_model <- runLDA(SeuratObj, ntopics = 50, normalizationMethod = "CLR", seed.number = 8)
 ```
 
 This will return an LDA model with 50 topics, created using the default
@@ -119,7 +119,14 @@ LDAelbowPlot("output_directory", SeuratObj)
 Now that we have built a model and determine that it does a good job of
 capturing our data, we can analyze the model. For the rest of the
 vignette, we will be using a model with 20 topics that was built on the
-dataset.
+dataset. Note that the LDA model is an indeterministic model, meaning
+the initial starting points will effet the output of the model. For this
+reason, setting a seed is important and the results above may be very
+very similar but not the exact same as what was recapitulated in the
+paper. For this reason, we will be showing an example of the results of
+our titan run from the manuscript which was generated with an internal
+seed. That file can be loaded
+[here](https://www.dropbox.com/s/t80us62cg1zm1vu/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds?dl=0).
 
 ### Load Data
 
@@ -132,10 +139,10 @@ top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
 
 The first step in the analysis pipeline is to add the topic information
 to the original Seurat object. This allows us to employ many of Seurat’s
-built in plot functions to visualize the
-model.
+built in plot functions to visualize the model.
 
 ``` r
+
 SeuratObj <- addTopicsToSeuratObject(model = top_model, Object = SeuratObj)
 ```
 
@@ -152,6 +159,7 @@ contribute most to each topic. Below is an example of showing only the
 top topic 1 genes and subsequent scores of said for the first 10 topics.
 
 ``` r
+
 GeneDistrubition <- GeneScores(top_model)
 
 ### head and sort the matrix by genes most contributing to Topic 1
@@ -178,6 +186,7 @@ which can be inputted into your favorite GO program.These genes can be
 used to connect each topic to a certain gene network or ontology.
 
 ``` r
+
 TopicGenes <- TopTopicGenes(top_model, ngenes = 50)
 kable(head(TopicGenes[,1:10], 10))
 ```
@@ -223,6 +232,7 @@ run it can also be done by wrangling the meta.data in your Seurat
 object.
 
 ``` r
+
 ## Using the get topics function
 LDA_topics <- GetTopics(top_model, SeuratObj)
 kable(head(LDA_topics[,1:10]))
@@ -295,6 +305,7 @@ with each treatment so we will be annotating the function with our
 treatment column, but one could use any other metadata column
 
 ``` r
+
 HeatmapTopic(Object = SeuratObj,
         topics =  LDA_topics,
         AnnoVector = SeuratObj@meta.data$hash.ID,
@@ -307,6 +318,7 @@ You can also cluster the topics of the heatmap so that topics with
 similar expression patterns across cells are grouped together.
 
 ``` r
+
 HeatmapTopic(Object = SeuratObj,
              topics =  LDA_topics,
              AnnoVector = SeuratObj@meta.data$hash.ID,
@@ -321,6 +333,7 @@ point. They can be sorted by any metadata column in the Seurat object as
 well, such as cluster.
 
 ``` r
+
 HeatmapTopic(Object = SeuratObj,
              topics =   LDA_topics, 
              AnnoVector = SeuratObj$seurat_clusters, 
@@ -337,6 +350,7 @@ embeddings within the Seurat object, and then colors the cells based on
 their expression of the given topic.
 
 ``` r
+
 FeaturePlot(SeuratObj, 
             pt.size = 0.01, 
             features  = "Topic_1", 
@@ -370,6 +384,7 @@ DimReducObject under the name “lda” which can be used to plot the two
 against eachother.
 
 ``` r
+
 DimPlot(SeuratObj, 
         pt.size = 0.01, 
         reduction = "lda", 
@@ -386,6 +401,7 @@ topic gradients one could also utalize the `FeaturePlot` function using
 the “lda” reduction as shown below.
 
 ``` r
+
 FeaturePlot(SeuratObj, 
         pt.size = 0.01, 
         reduction = "lda", 
@@ -405,6 +421,7 @@ topic or the other, but uncommon for both topics to be high in the same
 cell.
 
 ``` r
+
 DimPlot(SeuratObj, 
         pt.size = 0.01, 
         reduction = "lda", 
@@ -429,16 +446,24 @@ note is that Topic 9 in the MCF7 samples was the Estrogen specific
 topic. Also interestingly, topic modeling by 20 topics for MCF7 did not
 locate a progestorone specific topic.
 
+### Load Data
+
+First, read in the MCF7 PEPE model RDS which can be found
+[here](https://www.dropbox.com/s/procxdnedx2m6or/Model_MCF7_PEPE_20T_CLR_5000Variable_M10.rds?dl=0).
+
 ``` r
-DefaultAssay(SeuratObj) <- "RNA"
+top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
+```
+
+``` r
 SeuratObj <- ImputeAndAddTopics(SeuratObj, MCF7_top_model, TopicPrefix = "MCF7Imputed_Topic")
 HeatmapTopic(Object = SeuratObj,
-             topics =   Embeddings(SeuratObj, "imputedLDA"), 
-             AnnoVector = SeuratObj@meta.data$hash.ID, 
+             topics =   Embeddings(SeuratObj, "imputedLDA"),
+             AnnoVector = SeuratObj@meta.data$hash.ID,
              AnnoName = "Cluster")
 ```
 
-![](TITAN_vignette_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](TITAN_vignette_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 <!-- ### Using a SingleCellExperiment Object -->
 

@@ -42,7 +42,7 @@ library(tidyverse)
 
 In its current state, TITAN is built to work off of the R package `Seurat`. The first step in TITAN is to create a Seurat object containing your scRNA-seq data. This tutorial assumes that general QC has been run and poorly performing cells have been filtered out. Directions for that can be found in the vingette found [here](https://satijalab.org/seurat/v3.1/pbmc3k_tutorial.html). We also understand that there are other formats of single cell objects, such as SingleCellExpiriment. Seurat has documentation on conversion to SeuratObject from different types of objects found [here](https://satijalab.org/seurat/v3.1/conversion_vignette.html). Once you've done this, you can begin using TITAN. To begin building the model, the user has two options. 
 
-For this tutorial, the Seurat object we will be using can be downloaded as an RDS object from [thislink](https://www.dropbox.com/s/9lmst5aou3l0ipk/PEPE_T47D.rds?dl=0). This is a cancer cell line hormonal treatment time course. The dataset contains T47D single cells, some treated with estrogen, some treated with progesterone, and some treated with both estrogen and progesterone (which we refer to as PEPE treatment).
+For this tutorial, the Seurat object we will be using can be downloaded as an RDS object from [thislink](https://www.dropbox.com/s/sjzt0720ijj0ycs/PEPE_T47D.rds?dl=0). This is a cancer cell line hormonal treatment time course. The dataset contains T47D single cells, some treated with estrogen, some treated with progesterone, and some treated with both estrogen and progesterone (which we refer to as PEPE treatment).
 
 ## Building a Model
 
@@ -51,7 +51,7 @@ The first is running a single LDA model on the data. This process has two steps.
 ### Single topic
 ```{r eval = F}
 SeuratObj <- readRDS("PEPE_T47D.rds")
-LDA_model <- runLDA(SeuratObj, ntopics = 50, normalizationMethod = "CLR")
+LDA_model <- runLDA(SeuratObj, ntopics = 50, normalizationMethod = "CLR", seed.number = 8)
 
 ```
 
@@ -84,19 +84,20 @@ LDAelbowPlot("output_directory", SeuratObj)
 
 ## Analyzing Models
 
-Now that we have built a model and determine that it does a good job of capturing our data, we can analyze the model. For the rest of the vignette, we will be using a model with 20 topics that was built on the dataset.
+Now that we have built a model and determine that it does a good job of capturing our data, we can analyze the model. For the rest of the vignette, we will be using a model with 20 topics that was built on the dataset. Note that the LDA model is an indeterministic model, meaning the initial starting points will effet the output of the model. For this reason, setting a seed is important and the results above may be very very similar but not the exact same as what was recapitulated in the paper. For this reason, we will be showing an example of the results of our titan run from the manuscript which was generated with an internal seed. That file can be loaded [here](https://www.dropbox.com/s/t80us62cg1zm1vu/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds?dl=0).
 
 
 ### Load Data 
 
 First, read in the model RDS you just generated.
 
-```{r, eval = F, }
+```{r, eval = F, include = T}
 top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
 ```
 
 ```{r, eval = T, include = F}
-SeuratObj <- readRDS("~/Box Sync/Alex_Data/MCF7/PEPE/RDS/PEPE_T47D.rds")
+
+SeuratObj <- readRDS("~/Box Sync/Alex_Data/MCF7/Package/PEPE_T47D.rds")
 top_model <- readRDS("~/Box Sync/Alex_Data/MCF7/PEPE/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
 MCF7_top_model <- readRDS("~/Box Sync/Alex_Data/MCF7/MCF7_New/Model_MCF7_PEPE_20T_CLR_5000Variable_M10.rds")
 ```
@@ -104,6 +105,7 @@ MCF7_top_model <- readRDS("~/Box Sync/Alex_Data/MCF7/MCF7_New/Model_MCF7_PEPE_20
 The first step in the analysis pipeline is to add the topic information to the original Seurat object. This allows us to employ many of Seurat's built in plot functions to visualize the model.
 
 ```{r}
+
 SeuratObj <- addTopicsToSeuratObject(model = top_model, Object = SeuratObj)
 ```
 
@@ -114,6 +116,7 @@ Now that the topic information has been stored within the Seurat object, we can 
 
 
 ```{r}
+
 GeneDistrubition <- GeneScores(top_model)
 
 ### head and sort the matrix by genes most contributing to Topic 1
@@ -125,6 +128,7 @@ kable(head(GeneDistrubition[order(GeneDistrubition[,"Topic_1"], decreasing = T),
 An alternative to this matrix is to get a matrix of the top n genes in each topic. This can be done with `TopTopicScores`, which sorts the gene-topic matrix and outputs a matrix list of n genes for eaech topic which can be inputted into your favorite GO program.These genes can be used to connect each topic to a certain gene network or ontology. 
 
 ``` {r,}
+
 TopicGenes <- TopTopicGenes(top_model, ngenes = 50)
 kable(head(TopicGenes[,1:10], 10))
 kable(head(TopicGenes[,11:20], 10))
@@ -135,6 +139,7 @@ kable(head(TopicGenes[,11:20], 10))
 The second distrubtion that TITAN outputs is the cell-topic distrubition which outputs the contribution each cell belongs to a topic, calculated from the gene scores. The `GetTopics` function outputs a scaled cell-topic matrix. Alternatively, the `addTopicsToSeuratObject` function added this cell-topic matrix to our metadata files so if that has been run it can also be done by wrangling the meta.data in your Seurat object.
 
 ``` {r,}
+
 ## Using the get topics function
 LDA_topics <- GetTopics(top_model, SeuratObj)
 kable(head(LDA_topics[,1:10]))
@@ -154,6 +159,7 @@ kable(head(LDA_topics[,11:20]))
 Although, the cell-topic matrix contains valuable infomration about each cells contribution to each topic. It is often hard to parse. For this reason, it is nice to visualize which cells contribute to each topic and how each topic compares to eachother.To do this, we recommend visualizing the cell-topic matrix in heatmap form. The goal is to see which cells express which topics. The `heatmap` function allows one to plot the topics across a heatmap and sort the cells by a column of interest. In our case, we are wondering whihch topics are associated with each treatment so we will be annotating the function with our treatment column, but one could use any other metadata column
 
 ```{r, fig.width=11, fig.height=8.5}
+
 HeatmapTopic(Object = SeuratObj,
         topics =  LDA_topics,
         AnnoVector = SeuratObj@meta.data$hash.ID,
@@ -165,6 +171,7 @@ HeatmapTopic(Object = SeuratObj,
 You can also cluster the topics of the heatmap so that topics with similar expression patterns across cells are grouped together.
 
 ```{r, fig.width=11, fig.height=8.5}
+
 HeatmapTopic(Object = SeuratObj,
              topics =  LDA_topics,
              AnnoVector = SeuratObj@meta.data$hash.ID,
@@ -176,6 +183,7 @@ HeatmapTopic(Object = SeuratObj,
 In both of the above cases, the rows of the heatmap were sorted by time point. They can be sorted by any metadata column in the Seurat object as well, such as cluster.
 
 ```{r, fig.width=11, fig.height=8.5}
+
 HeatmapTopic(Object = SeuratObj,
              topics =   LDA_topics, 
              AnnoVector = SeuratObj$seurat_clusters, 
@@ -190,6 +198,7 @@ HeatmapTopic(Object = SeuratObj,
 Another way to visualize the expression of the topics is through Seurat's FeaturePlot function. This plots the cells using the UMAP embeddings within the Seurat object, and then colors the cells based on their expression of the given topic.
 
 ```{r, fig.width=11, fig.height=8.5}
+
 FeaturePlot(SeuratObj, 
             pt.size = 0.01, 
             features  = "Topic_1", 
@@ -210,6 +219,7 @@ FeaturePlot(SeuratObj,
 Further, we find it also useful to plot two LDA topics against eachother when trying to compare how cells react to different tracriptional topics. An example being in our T47D expriment, we were interested in how the progestorne-specific topic (Topic 1) and an estrogen-specific topic (Topic 17) segregate out cells by treatment. To do this, we can plot the scores of the two topics using the `DimPlot` function in Seurat. When running `addTopicsToSeruatObject`, the function creates a DimReducObject under the name "lda" which can be used to plot the two against eachother. 
 
 ```{r, fig.width=8, fig.height=6}
+
 DimPlot(SeuratObj, 
         pt.size = 0.01, 
         reduction = "lda", 
@@ -221,6 +231,7 @@ DimPlot(SeuratObj,
 
 Further, if one wanted to visualize the expression of a gene across two topic gradients one could also utalize the `FeaturePlot` function using the "lda" reduction as shown below. 
 ``` {r, fig.width=8, fig.height=6}
+
 FeaturePlot(SeuratObj, 
         pt.size = 0.01, 
         reduction = "lda", 
@@ -233,6 +244,7 @@ FeaturePlot(SeuratObj,
 Another example of how one could look at the data would be to see how two topics that have similar patterns differ from eachother. If one looks back at the heatmap, topics 11 and topics 17 both showed high expression at the late estrogen timepoint, yet when ploted against eachother one can see a start pattern of cells that either undergo one topic or the other, but uncommon for both topics to be high in the same cell.
 
 ``` {r, fig.width=8, fig.height=6}
+
 DimPlot(SeuratObj, 
         pt.size = 0.01, 
         reduction = "lda", 
@@ -247,12 +259,19 @@ DimPlot(SeuratObj,
 
 In addition, because of the way that topic modeling works, comparisons of gene sets that are enriched in topics from different expiriments can be compared from dataset to dataset by looking at the expression of the top genes within the topic. We do this by using Seurat's `AddModuleScore` function which uses the method established by [Teirosh et al](https://science.sciencemag.org/content/352/6282/189). Here is an example of the same treatment timecourse in the MCF7 cell line (Same treatments P, E & EP). This allows one to visualize how the MCF7 topics are seen under the same conditions in the t47D cell line, One finding of note is that Topic 9 in the MCF7 samples was the Estrogen specific topic. Also interestingly, topic modeling by 20 topics for MCF7 did not locate a progestorone specific topic. 
 
+### Load Data
+
+First, read in the MCF7 PEPE model RDS which can be found [here](https://www.dropbox.com/s/procxdnedx2m6or/Model_MCF7_PEPE_20T_CLR_5000Variable_M10.rds?dl=0).
+
+```{r, eval = F, }
+top_model <- readRDS("../data/Model_PEPE_T47D_20T_CLR_5000Variable_M10.rds")
+```
+
 ```{r, fig.width=11, fig.height=8.5, warning=FALSE}
-DefaultAssay(SeuratObj) <- "RNA"
 SeuratObj <- ImputeAndAddTopics(SeuratObj, MCF7_top_model, TopicPrefix = "MCF7Imputed_Topic")
 HeatmapTopic(Object = SeuratObj,
-             topics =   Embeddings(SeuratObj, "imputedLDA"), 
-             AnnoVector = SeuratObj@meta.data$hash.ID, 
+             topics =   Embeddings(SeuratObj, "imputedLDA"),
+             AnnoVector = SeuratObj@meta.data$hash.ID,
              AnnoName = "Cluster")
 
 
