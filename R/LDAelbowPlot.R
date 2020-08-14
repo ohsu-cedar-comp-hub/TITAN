@@ -31,10 +31,10 @@ LDAelbowPlot <- function(model_dir,
     Object        <- NormalizeData(Object, assay = "RNA", normalization.method = "CLR")
     Object        <- FindVariableFeatures(Object, assay = "RNA", nfeatures = varFeatures)
     Object.sparse <- GetAssayData(Object, slot = "data",assay = "RNA")
-    data.use <- Object.sparse[VariableFeatures(Object, assay = "RNA"),]
+    Object.sparse <- Object.sparse[VariableFeatures(Object, assay = "RNA"),]
    
     #convert data into the proper input format for lda.collapsed.gibbs.sampler
-    #data.use      <- Matrix::Matrix(Object.sparse, sparse = T)
+    data.use      <- Matrix::Matrix(Object.sparse, sparse = T)
   } else if (class(Object) == "SingleCellExperiment") {
     normalized_sce <- NormalizeData(assay(Object, "counts"), normalization.method = "CLR")
     varFeats <- FindVariableFeatures(normalized_sce)
