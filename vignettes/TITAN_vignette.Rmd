@@ -75,7 +75,9 @@ The above command will run 10 instances of the `runLDA` function starting with o
 Now the task is to determine which of these models is the ideal one to use in downstream analysis. To do this we have developed our own version of an Elbow plot. This elbow plot looks at the perplexity of each model, a measure how well the model fits the data while also giving models that use less parameters a higher score. The Y axis of the plot is the RPC (rate of perplexity change), which looks at how much the perplexity changes as the topic number increases. This method is based off [this](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-16-S13-S8) paper by Zhao et al.
 
 ```{r eval = F}
-LDAelbowPlot("output_directory", SeuratObj)
+library(TITAN)
+
+LDAelbowPlot("~/Desktop/outputTest/", SeuratObj)
 
 ```
 

@@ -14,6 +14,8 @@ HeatmapTopic(Object, topics, AnnoVector, AnnoName, clusterTopics = F)
 \item{AnnoVector}{Vector of cell annotations}
 
 \item{AnnoName}{Name of cell annotation}
+
+\item{clusterTopics}{Logical whether to cluster topics or not}
 }
 \value{
 pheatmap object

@@ -4,8 +4,14 @@
 \alias{HeatmapSortByTopicAsWellAsAnno}
 \title{Topic Heatmap - sorted by topic and annotation}
 \usage{
-HeatmapSortByTopicAsWellAsAnno(Object, topics, sortByTopic = "Topic_1",
-  AnnoVector, AnnoName)
+HeatmapSortByTopicAsWellAsAnno(
+  Object,
+  topics,
+  sortByTopic = "Topic_1",
+  AnnoVector,
+  AnnoName,
+  clusterTopics = F
+)
 }
 \arguments{
 \item{Object}{Seurat object containing the data the model was created with.}
@@ -17,6 +23,8 @@ HeatmapSortByTopicAsWellAsAnno(Object, topics, sortByTopic = "Topic_1",
 \item{AnnoVector}{Vector of cell annotations}
 
 \item{AnnoName}{Name of cell annotation}
+
+\item{clusterTopics}{Logical whether to cluster topics or not}
 }
 \value{
 pheatmap object

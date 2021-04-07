@@ -31,6 +31,7 @@ gg_color_hue <- function(n) {
 #' @param topics document-topic matrix
 #' @param AnnoVector Vector of cell annotations
 #' @param AnnoName Name of cell annotation
+#' @param clusterTopics Logical whether to cluster topics or not
 #'
 #' @examples
 #' Heatmap(SeuratObj, DocTopMat, SeuratObj$annotation, "NameOfAnnotation")
@@ -100,6 +101,7 @@ HeatmapTopic <- function(Object,
 #' @param sortByTopic topic to be sorted by
 #' @param AnnoVector Vector of cell annotations
 #' @param AnnoName Name of cell annotation
+#' @param clusterTopics Logical whether to cluster topics or not
 #'
 #' @examples
 #' HeatmapSortByTopic(SeuratObj, DocTopMat, "Topic_16", SeuratObj$annotation, "NameOfAnnotation")
@@ -116,7 +118,8 @@ HeatmapTopic <- function(Object,
 HeatmapSortByTopic  <- function(Object,
                                 topics,
                                 sortByTopic =  "Topic_1",
-                                AnnoVector, AnnoName) {
+                                AnnoVector, AnnoName,
+                                clusterTopics = F) {
 
   #Create a dataframe with the annotation information and corresponding colors
   anno_col           <- data.frame(row.names = colnames(Object),
@@ -132,16 +135,29 @@ HeatmapSortByTopic  <- function(Object,
   topics <- data.matrix(topics[order(topics[,sortByTopic]),])
 
   #plot Heatmap
-  p1 <- pheatmap(topics,
-                 hclustfun = function(x) hclust(x, method="ward.D2"),
-                 scale = "row",
-                 cluster_cols = F,
-                 cluster_rows = F,show_rownames = F,
-                 col=colorRampPalette(rev(brewer.pal(11, "RdBu"))[c(1:4,8:11)])(256),
-                 annotation_row = anno_col,
-                 annotation_names_row = T,
-                 annotation_colors = anno_colors,
-                 cex=1)
+  if (clusterTopics == F) {
+    p1 <- pheatmap(topics,
+                   hclustfun = function(x) hclust(x, method="ward.D2"),
+                   scale = "row",
+                   cluster_cols = F,
+                   cluster_rows = F,show_rownames = F,
+                   col=colorRampPalette(rev(brewer.pal(11, "RdBu"))[c(1:4,8:11)])(256),
+                   annotation_row = anno_col,
+                   annotation_names_row = T,
+                   annotation_colors = anno_colors,
+                   cex=1) 
+  } else {
+    p1 <- pheatmap(topics,
+                   hclustfun = function(x) hclust(x, method="ward.D2"),
+                   scale = "row",
+                   cluster_cols = T,
+                   cluster_rows = F,show_rownames = F,
+                   col=colorRampPalette(rev(brewer.pal(11, "RdBu"))[c(1:4,8:11)])(256),
+                   annotation_row = anno_col,
+                   annotation_names_row = T,
+                   annotation_colors = anno_colors,
+                   cex=1) 
+  }
   return(p1)
 }
 
@@ -156,6 +172,7 @@ HeatmapSortByTopic  <- function(Object,
 #' @param sortByTopic topic to be sorted by
 #' @param AnnoVector Vector of cell annotations
 #' @param AnnoName Name of cell annotation
+#' @param clusterTopics Logical whether to cluster topics or not
 #'
 #' @examples
 #' HeatmapSortByTopicAsWellAsAnno(SeuratObj, DocTopMat, "Topic_16", SeuratObj$annotation, "NameOfAnnotation")
@@ -172,7 +189,8 @@ HeatmapSortByTopic  <- function(Object,
 HeatmapSortByTopicAsWellAsAnno  <- function(Object,
                                             topics,
                                             sortByTopic =  "Topic_1",
-                                            AnnoVector, AnnoName) {
+                                            AnnoVector, AnnoName,
+                                            clusterTopics = F) {
 
   #Create a dataframe with the annotation information and corresponding colors
   anno_col           <- data.frame(row.names = colnames(Object),
@@ -188,16 +206,29 @@ HeatmapSortByTopicAsWellAsAnno  <- function(Object,
   topics <- data.matrix(topics[order( anno_col[,1], topics[,sortByTopic]),])
 
   #plot Heatmap
-  p1 <- pheatmap(topics,
-                 hclustfun = function(x) hclust(x, method="ward.D2"),
-                 scale = "row",
-                 cluster_cols = F,
-                 cluster_rows = F,show_rownames = F,
-                 col=colorRampPalette(rev(brewer.pal(11, "RdBu"))[c(1:4,8:11)])(256),
-                 annotation_row = anno_col,
-                 annotation_names_row = T,
-                 annotation_colors = anno_colors,
-                 cex=1)
+  if (clusterTopics == F) {
+    p1 <- pheatmap(topics,
+                   hclustfun = function(x) hclust(x, method="ward.D2"),
+                   scale = "row",
+                   cluster_cols = F,
+                   cluster_rows = F,show_rownames = F,
+                   col=colorRampPalette(rev(brewer.pal(11, "RdBu"))[c(1:4,8:11)])(256),
+                   annotation_row = anno_col,
+                   annotation_names_row = T,
+                   annotation_colors = anno_colors,
+                   cex=1)
+  } else {
+    p1 <- pheatmap(topics,
+                   hclustfun = function(x) hclust(x, method="ward.D2"),
+                   scale = "row",
+                   cluster_cols = T,
+                   cluster_rows = F,show_rownames = F,
+                   col=colorRampPalette(rev(brewer.pal(11, "RdBu"))[c(1:4,8:11)])(256),
+                   annotation_row = anno_col,
+                   annotation_names_row = T,
+                   annotation_colors = anno_colors,
+                   cex=1)
+  }
   return(p1)
 }
 
