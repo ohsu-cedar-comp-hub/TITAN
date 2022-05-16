@@ -17,7 +17,6 @@
 #'
 #' @import Seurat
 #' @import text2vec
-#' @import LICORS
 #' @import lda
 #' @import SingleCellExperiment
 
@@ -32,7 +31,7 @@ LDAelbowPlot <- function(model_dir,
     Object        <- FindVariableFeatures(Object, assay = "RNA", nfeatures = varFeatures)
     Object.sparse <- GetAssayData(Object, slot = "data",assay = "RNA")
     Object.sparse <- Object.sparse[VariableFeatures(Object, assay = "RNA"),]
-   
+
     #convert data into the proper input format for lda.collapsed.gibbs.sampler
     data.use      <- Matrix::Matrix(Object.sparse, sparse = T)
   } else if (class(Object) == "SingleCellExperiment") {
@@ -65,10 +64,10 @@ LDAelbowPlot <- function(model_dir,
     docterMat     <- as(docterMat, "sparseMatrix")
 
     #calculate topic word distribution
-    topworddist   <- LICORS::normalize(model$topics, byrow = T)
+    topworddist   <- normalize(model$topics, byrow = T)
 
     #calculate document topic distribution
-    doctopdist    <- LICORS::normalize(t(model$document_sums), byrow = T)
+    doctopdist    <- normalize(t(model$document_sums), byrow = T)
 
     #calculate perpelexity
     perp          <- perplexity(docterMat, topworddist, doctopdist)
