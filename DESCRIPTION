@@ -4,10 +4,9 @@ Version: 0.0.0.9000
 Authors: 
     Alex Chitsazan <chitsaza@ohsu.edu>
     Aaron Doe <doe@ohsu.edu>
-Description: What the package does (one paragraph).
+Description: LDA processing and vizualization for scRNA-seq.
 License: What license it uses
 Imports:
-    LICORS,
     Seurat,
     lda,
     text2vec
