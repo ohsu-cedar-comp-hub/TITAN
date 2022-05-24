@@ -18,8 +18,7 @@
 #' @import Seurat
 #' @import text2vec
 #' @import lda
-#' @import SingleCellExperiment
-
+#'
 LDAelbowPlot <- function(model_dir,
                          Object, varFeatures = 5000) {
   files <- list.files(path = model_dir, pattern = "Model_")

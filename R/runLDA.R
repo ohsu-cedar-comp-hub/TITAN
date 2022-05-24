@@ -28,7 +28,6 @@
 #' @import Seurat
 #' @import lda
 #' @import parallel
-#' @import SingleCellExperiment
 
 
 runLDA <- function(Object,
@@ -85,6 +84,9 @@ runLDA <- function(Object,
       compute.log.likelihood=TRUE,
       burnin=burnin)[-1]
     if (parallel) {
+      if (!dir.exists(outDir)) {
+        dir.create(outDir)
+      }
       saveRDS(selected.Model, paste0(outDir, "/Model_", as.character(topics), "topics.rds"))
     } else {
       return(selected.Model)
