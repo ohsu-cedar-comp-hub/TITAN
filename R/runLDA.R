@@ -15,6 +15,7 @@
 #' @param outDir if parallel = TRUE, the output directory for the multiple models
 #' @param cores Number of cores to use, only applicable if parallel = TRUE
 #' @param seed.number random integer to set seed
+#' @param assayName The name of the assay holding the source data
 #'
 #'
 #' @examples
@@ -41,17 +42,18 @@ runLDA <- function(Object,
                    parallel = F,
                    outDir = NULL,
                    cores = 1,
-                   normalizationMethod = "CLR") {
+                   normalizationMethod = "CLR",
+                   assayName = "RNA") {
 
   ## Set seed
   set.seed(seed.number)
 
   if (class(Object) == "Seurat") {
   #Normalize and extract the gene expression data from the Seurat Object
-    Object        <- NormalizeData(Object, assay = "RNA", normalization.method = normalizationMethod)
-    Object        <- FindVariableFeatures(Object, assay = "RNA", nfeatures = varFeatures)
-    Object.sparse <- GetAssayData(Object, slot = "data",assay = "RNA")
-    Object.sparse <- Object.sparse[VariableFeatures(Object, assay = "RNA"),]
+    Object        <- NormalizeData(Object, assay = assayName, normalization.method = normalizationMethod)
+    Object        <- FindVariableFeatures(Object, assay = assayName, nfeatures = varFeatures)
+    Object.sparse <- GetAssayData(Object, slot = "data",assay = assayName)
+    Object.sparse <- Object.sparse[VariableFeatures(Object, assay = assayName),]
 
   #convert data into the proper input format for lda.collapsed.gibbs.sampler
     data.use      <- Matrix::Matrix(Object.sparse, sparse = T)

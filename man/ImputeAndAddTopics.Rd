@@ -4,7 +4,12 @@
 \alias{ImputeAndAddTopics}
 \title{Adds imputed Topics to a seruat object}
 \usage{
-ImputeAndAddTopics(Object, model, TopicPrefix = "ImputedTopic")
+ImputeAndAddTopics(
+  Object,
+  model,
+  TopicPrefix = "ImputedTopic",
+  assayName = "RNA"
+)
 }
 \arguments{
 \item{Object}{Seurat object containing the data the model was created with.}
@@ -12,6 +17,8 @@ ImputeAndAddTopics(Object, model, TopicPrefix = "ImputedTopic")
 \item{model}{LDA model output}
 
 \item{TopicPrefix}{Prefix of Topics to be added to your metaData (Default "ImputedTopic")}
+
+\item{assayName}{The name of the assay to associate with the reduction}
 }
 \value{
 Seurat object with updated metadata of imputed geneExpression

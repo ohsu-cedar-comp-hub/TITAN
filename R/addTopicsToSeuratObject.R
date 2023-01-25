@@ -5,6 +5,7 @@
 #'
 #' @param model LDA model output
 #' @param Object Seurat object containing the data the model was created with.
+#' @param assayName The name of the assay to associate with the reduction
 #'
 #' @examples
 #' addTopicsToSeuratObject(LDAmodel, SeuratObj)
@@ -17,7 +18,7 @@
 #' @import Seurat
 
 addTopicsToSeuratObject <- function(model,
-                                    Object) {
+                                    Object, assayName = "RNA") {
 
   ## Get Cell Topic Scores and scale across Topics
   modelMat           <- t(scale(model$document_expects, center=TRUE, scale=TRUE))
@@ -32,7 +33,7 @@ addTopicsToSeuratObject <- function(model,
   Object[["lda"]] <- CreateDimReducObject(
     embeddings = modelMat,
     key = "lda_",
-    assay = "RNA",
+    assay = assayName,
     global = TRUE
   )
   return(Object)

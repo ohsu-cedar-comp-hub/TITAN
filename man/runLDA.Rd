@@ -16,7 +16,8 @@ runLDA(
   parallel = F,
   outDir = NULL,
   cores = 1,
-  normalizationMethod = "CLR"
+  normalizationMethod = "CLR",
+  assayName = "RNA"
 )
 }
 \arguments{
@@ -43,6 +44,8 @@ runLDA(
 \item{cores}{Number of cores to use, only applicable if parallel = TRUE}
 
 \item{normalizationMethod}{Normalization method used by Seurat NormalizeData. Options are CLR, LogNormalize and RC.}
+
+\item{assayName}{The name of the assay holding the source data}
 }
 \value{
 LDA Model

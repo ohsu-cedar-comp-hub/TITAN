@@ -6,6 +6,7 @@
 #' @param model_dir Directory containing the models created using a varying number of topics.
 #' @param Object Object containing the data the model was created with.
 #' @param VarFeatures the number of variable features to use in the LDA model. MUST MATCH WITH MODELS IN model_dir
+#' @param assayName The name of the assay holding the source data
 #'
 #' @examples
 #' LDAelbowPlot(test_dir, SeuratObj)
@@ -20,16 +21,16 @@
 #' @import lda
 #'
 LDAelbowPlot <- function(model_dir,
-                         Object, varFeatures = 5000) {
+                         Object, varFeatures = 5000, assayName = "RNA") {
   files <- list.files(path = model_dir, pattern = "Model_")
 
   # Get model input data
   if (class(Object) == "Seurat") {
     #Normalize and extract the gene expression data from the Seurat Object
-    Object        <- NormalizeData(Object, assay = "RNA", normalization.method = "CLR")
-    Object        <- FindVariableFeatures(Object, assay = "RNA", nfeatures = varFeatures)
-    Object.sparse <- GetAssayData(Object, slot = "data",assay = "RNA")
-    Object.sparse <- Object.sparse[VariableFeatures(Object, assay = "RNA"),]
+    Object        <- NormalizeData(Object, assay = assayName, normalization.method = "CLR")
+    Object        <- FindVariableFeatures(Object, assay = assayName, nfeatures = varFeatures)
+    Object.sparse <- GetAssayData(Object, slot = "data",assay = assayName)
+    Object.sparse <- Object.sparse[VariableFeatures(Object, assay = assayName),]
 
     #convert data into the proper input format for lda.collapsed.gibbs.sampler
     data.use      <- Matrix::Matrix(Object.sparse, sparse = T)
