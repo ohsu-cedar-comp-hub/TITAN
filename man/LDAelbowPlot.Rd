@@ -4,7 +4,13 @@
 \alias{LDAelbowPlot}
 \title{Topic Elbow Plot}
 \usage{
-LDAelbowPlot(model_dir, Object, varFeatures = 5000, assayName = "RNA")
+LDAelbowPlot(
+  model_dir,
+  Object,
+  varFeatures = 5000,
+  assayName = "RNA",
+  skipNormalization = FALSE
+)
 }
 \arguments{
 \item{model_dir}{Directory containing the models created using a varying number of topics.}
@@ -12,6 +18,8 @@ LDAelbowPlot(model_dir, Object, varFeatures = 5000, assayName = "RNA")
 \item{Object}{Object containing the data the model was created with.}
 
 \item{assayName}{The name of the assay holding the source data}
+
+\item{skipNormalization}{If true, the data are assumed to be pre-normalized. Both normalization and Seurat::FindVarialeFeatures() are skipped. Therefore the arguments normalizationMethod and varFeatures are ignored.}
 
 \item{VarFeatures}{the number of variable features to use in the LDA model. MUST MATCH WITH MODELS IN model_dir}
 }

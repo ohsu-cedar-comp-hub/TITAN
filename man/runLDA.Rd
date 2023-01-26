@@ -17,7 +17,8 @@ runLDA(
   outDir = NULL,
   cores = 1,
   normalizationMethod = "CLR",
-  assayName = "RNA"
+  assayName = "RNA",
+  skipNormalization = FALSE
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ runLDA(
 \item{normalizationMethod}{Normalization method used by Seurat NormalizeData. Options are CLR, LogNormalize and RC.}
 
 \item{assayName}{The name of the assay holding the source data}
+
+\item{skipNormalization}{If true, the data are assumed to be pre-normalized. Both normalization and Seurat::FindVarialeFeatures() are skipped. Therefore the arguments normalizationMethod and varFeatures are ignored.}
 }
 \value{
 LDA Model

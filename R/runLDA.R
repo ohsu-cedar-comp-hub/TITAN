@@ -16,6 +16,7 @@
 #' @param cores Number of cores to use, only applicable if parallel = TRUE
 #' @param seed.number random integer to set seed
 #' @param assayName The name of the assay holding the source data
+#' @param skipNormalization If true, the data are assumed to be pre-normalized. Both normalization and Seurat::FindVarialeFeatures() are skipped. Therefore the arguments normalizationMethod and varFeatures are ignored.
 #'
 #'
 #' @examples
@@ -43,17 +44,21 @@ runLDA <- function(Object,
                    outDir = NULL,
                    cores = 1,
                    normalizationMethod = "CLR",
-                   assayName = "RNA") {
+                   assayName = "RNA",
+                   skipNormalization = FALSE) {
 
   ## Set seed
   set.seed(seed.number)
 
   if (class(Object) == "Seurat") {
   #Normalize and extract the gene expression data from the Seurat Object
+  if (!skipNormalization) {
     Object        <- NormalizeData(Object, assay = assayName, normalization.method = normalizationMethod)
     Object        <- FindVariableFeatures(Object, assay = assayName, nfeatures = varFeatures)
-    Object.sparse <- GetAssayData(Object, slot = "data",assay = assayName)
-    Object.sparse <- Object.sparse[VariableFeatures(Object, assay = assayName),]
+  }
+
+  Object.sparse <- GetAssayData(Object, slot = "data",assay = assayName)
+  Object.sparse <- Object.sparse[VariableFeatures(Object, assay = assayName),]
 
   #convert data into the proper input format for lda.collapsed.gibbs.sampler
     data.use      <- Matrix::Matrix(Object.sparse, sparse = T)
@@ -94,6 +99,13 @@ runLDA <- function(Object,
       return(selected.Model)
     }
   }
+
+  # If ntopics is a vector, we need to run model_maker once per ntopic
+  if (length(ntopics) > 1 && !parallel) {
+    parallel <- TRUE
+    cores <- 1
+  }
+
   if (parallel) {
     mclapply(ntopics, model_maker, mc.cores = cores)
   }

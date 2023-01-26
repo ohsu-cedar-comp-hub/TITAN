@@ -7,6 +7,7 @@
 #' @param Object Object containing the data the model was created with.
 #' @param VarFeatures the number of variable features to use in the LDA model. MUST MATCH WITH MODELS IN model_dir
 #' @param assayName The name of the assay holding the source data
+#' @param skipNormalization If true, the data are assumed to be pre-normalized. Both normalization and Seurat::FindVarialeFeatures() are skipped. Therefore the arguments normalizationMethod and varFeatures are ignored.
 #'
 #' @examples
 #' LDAelbowPlot(test_dir, SeuratObj)
@@ -21,14 +22,16 @@
 #' @import lda
 #'
 LDAelbowPlot <- function(model_dir,
-                         Object, varFeatures = 5000, assayName = "RNA") {
+                         Object, varFeatures = 5000, assayName = "RNA", skipNormalization = FALSE) {
   files <- list.files(path = model_dir, pattern = "Model_")
 
   # Get model input data
   if (class(Object) == "Seurat") {
     #Normalize and extract the gene expression data from the Seurat Object
-    Object        <- NormalizeData(Object, assay = assayName, normalization.method = "CLR")
-    Object        <- FindVariableFeatures(Object, assay = assayName, nfeatures = varFeatures)
+    if (!skipNormalization) {
+      Object        <- NormalizeData(Object, assay = assayName, normalization.method = "CLR")
+      Object        <- FindVariableFeatures(Object, assay = assayName, nfeatures = varFeatures)
+    }
     Object.sparse <- GetAssayData(Object, slot = "data",assay = assayName)
     Object.sparse <- Object.sparse[VariableFeatures(Object, assay = assayName),]
 
