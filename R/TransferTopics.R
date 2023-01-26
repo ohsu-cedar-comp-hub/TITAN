@@ -25,7 +25,7 @@ TransferTopics <- function(Object, Model, TopicPrefix = "Topic", assayName = "RN
   wordList   <- split(Top50Words, rep(1:ncol(Top50Words), each = nrow(Top50Words)))
   
   #Creates a module score in the new dataset using those top genes
-  SeuratObject <- AddModuleScore(SeuratObject, features = wordList, name = paste0(TopicPrefix, "_"))
+  SeuratObject <- AddModuleScore(SeuratObject, features = wordList, name = paste0(TopicPrefix, "_"), assay = assayName)
   
   SeuratObject[["imputedLDA"]] <- CreateDimReducObject(
     embeddings = as.matrix(SeuratObject@meta.data %>% select(starts_with(TopicPrefix))),
