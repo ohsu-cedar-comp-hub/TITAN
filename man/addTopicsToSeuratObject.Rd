@@ -4,12 +4,14 @@
 \alias{addTopicsToSeuratObject}
 \title{Adds topic information to Seurat metadata}
 \usage{
-addTopicsToSeuratObject(model, Object)
+addTopicsToSeuratObject(model, Object, assayName = "RNA")
 }
 \arguments{
 \item{model}{LDA model output}
 
 \item{Object}{Seurat object containing the data the model was created with.}
+
+\item{assayName}{The name of the assay to associate with the reduction}
 }
 \value{
 Seurat object with updated metadata

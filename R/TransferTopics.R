@@ -6,6 +6,7 @@
 #' @param Object Seurat object to transfer topics onto
 #' @param Model LDA model using data from another dataset
 #' @param TopicPrefix Common prefix for topics in the LDA model
+#' @param assayName The name of the assay to associate with the reduction
 #' 
 #'
 #' @examples
@@ -18,7 +19,7 @@
 #' @import Seurat
 
 
-TransferTopics <- function(Object, Model, TopicPrefix = "Topic") {
+TransferTopics <- function(Object, Model, TopicPrefix = "Topic", assayName = "RNA") {
   #extracts the top genes for each topic from the word-topic distribution
   Top50Words <- top.topic.words(Model$topics, 50, by.score = T)
   wordList   <- split(Top50Words, rep(1:ncol(Top50Words), each = nrow(Top50Words)))
@@ -29,7 +30,7 @@ TransferTopics <- function(Object, Model, TopicPrefix = "Topic") {
   SeuratObject[["imputedLDA"]] <- CreateDimReducObject(
     embeddings = as.matrix(SeuratObject@meta.data %>% select(starts_with(TopicPrefix))),
     key = "imputedLDA_",
-    assay = "RNA",
+    assay = assayName,
     global = TRUE
   )
   return(SeuratObject)

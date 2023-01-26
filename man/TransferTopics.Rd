@@ -4,7 +4,7 @@
 \alias{TransferTopics}
 \title{Transfers topics from one dataset to another}
 \usage{
-TransferTopics(Object, Model, TopicPrefix = "Topic")
+TransferTopics(Object, Model, TopicPrefix = "Topic", assayName = "RNA")
 }
 \arguments{
 \item{Object}{Seurat object to transfer topics onto}
@@ -12,6 +12,8 @@ TransferTopics(Object, Model, TopicPrefix = "Topic")
 \item{Model}{LDA model using data from another dataset}
 
 \item{TopicPrefix}{Common prefix for topics in the LDA model}
+
+\item{assayName}{The name of the assay to associate with the reduction}
 }
 \value{
 Seurat object with topics transferred into its metadata

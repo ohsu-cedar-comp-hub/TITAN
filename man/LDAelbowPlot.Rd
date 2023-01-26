@@ -4,12 +4,14 @@
 \alias{LDAelbowPlot}
 \title{Topic Elbow Plot}
 \usage{
-LDAelbowPlot(model_dir, Object, varFeatures = 5000)
+LDAelbowPlot(model_dir, Object, varFeatures = 5000, assayName = "RNA")
 }
 \arguments{
 \item{model_dir}{Directory containing the models created using a varying number of topics.}
 
 \item{Object}{Object containing the data the model was created with.}
+
+\item{assayName}{The name of the assay holding the source data}
 
 \item{VarFeatures}{the number of variable features to use in the LDA model. MUST MATCH WITH MODELS IN model_dir}
 }
