@@ -1,4 +1,8 @@
-# TITAN (Topic Inferance Of Transcriptionally Associated Networks)
+# TITANv2 - in development (Topic Inferance Of Transcriptionally Associated Networks)
+
+### Disclaimer
+
+This is the development branch of TITANv2 which has the capability to incorporate spatial coordinates into the model, creating topics containing both RNA and spatial information. To run TITANv2, first run the create_invDist.py script to build the inverse distance matrix. Then run the script spatial_TITANv3.R to create the model. Once the model is created, it can be analyzed using the built-in functions of TITANv1 which can be installed from the main branch.
 
 ### Summary
 
