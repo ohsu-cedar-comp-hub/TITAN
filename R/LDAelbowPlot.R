@@ -28,7 +28,11 @@ LDAelbowPlot <- function(model_dir,
   if (class(Object) == "Seurat") {
     #Normalize and extract the gene expression data from the Seurat Object
     Object        <- NormalizeData(Object, assay = assayName, normalization.method = "CLR")
-    Object        <- FindVariableFeatures(Object, assay = assayName, nfeatures = varFeatures)
+    if (assayName == "SCT") {
+        Object        <- SelectIntegrationFeatures(Object, assay = assayName, nfeatures = varFeatures, fvf.nfeatures = varFeatures)
+    } else {
+        Object        <- FindVariableFeatures(Object, assay = assayName, nfeatures = varFeatures)
+    }
     Object.sparse <- GetAssayData(Object, slot = "data",assay = assayName)
     Object.sparse <- Object.sparse[VariableFeatures(Object, assay = assayName),]
 
