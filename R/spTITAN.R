@@ -38,7 +38,7 @@ getCentroids <- function(Object,
     rownames(center_df) <- paste0("centroid_", 1:nrow(center_df))
 
     total_df <- rbind(pos_df, center_df)
-    colnames(total_df) <- c("x_pos", "y_pos")
+    colnames(total_df) <- c("x_pos", "y_pos", "points")
 
     p <- ggplot(total_df, mapping = aes(x=x_pos, y=y_pos, color = points)) + geom_point() + theme_classic()
     print(p)
