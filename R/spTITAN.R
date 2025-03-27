@@ -31,7 +31,7 @@ getCentroids <- function(Object,
     pos_df <- pos_df[colnames(Object), 1:2]
     pos_df$points <- "data"
     
-    km <- kmeans(pos_df, k, nstart = 25)
+    km <- kmeans(pos_df[,1:2], k, nstart = 25)
 
     center_df <- as.data.frame(km$center)
     center_df$points <- "centroid"
